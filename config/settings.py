@@ -136,7 +136,7 @@ MAILERS = {
 }
 
 LOGIN_REDIRECT_URL = "/booking/admin-dashboard/"
-LOGIN_URL = "/registration/login/"
+LOGIN_URL = "/accounts/login/"
 
 RAZORPAY_KEY_ID = os.environ.get("rzp_test_TYRU0JtCuPqHmy")
 RAZORPAY_KEY_SECRET = os.environ.get("Vn75SPcnfUurDROX0pbHHAz2")
