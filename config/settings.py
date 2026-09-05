@@ -138,5 +138,5 @@ MAILERS = {
 LOGIN_REDIRECT_URL = "/booking/admin-dashboard/"
 LOGIN_URL = "/accounts/login/"
 
-RAZORPAY_KEY_ID = os.environ.get("rzp_test_TYRU0JtCuPqHmy")
-RAZORPAY_KEY_SECRET = os.environ.get("Vn75SPcnfUurDROX0pbHHAz2")
+RAZORPAY_KEY_ID = os.environ.get("rzp_test_TYSuNasQDzmXCq")
+RAZORPAY_KEY_SECRET = os.environ.get("7EiFPIdyxN5S8hC15QESpacX")
