@@ -7,7 +7,6 @@ from .models import Turf
 from bookings.models import Booking
 
 
-@login_required(login_url="login")
 def home(request):
 
     turfs = Turf.objects.filter(is_active=True)
