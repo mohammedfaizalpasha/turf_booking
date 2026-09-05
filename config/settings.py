@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,5 +138,5 @@ MAILERS = {
 LOGIN_REDIRECT_URL = "/booking/admin-dashboard/"
 LOGIN_URL = "/registration/login/"
 
-RAZORPAY_KEY_ID = "rzp_test_TXj0wTfQDzefdq"
-RAZORPAY_KEY_SECRET = "A7QfmVvARL4RV9FpDfyoIq00"
+RAZORPAY_KEY_ID = os.environ.get("rzp_test_TYQyNd1dkbi7B8")
+RAZORPAY_KEY_SECRET = os.environ.get("ObzkRnZLiGAxQBAe7Z3KxvsL")
