@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-bl$k!z#*bz@(k4ceonzagc!e&5a$a2=&!ylqg73grxachypgd2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "turf-booking-cspb.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
