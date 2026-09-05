@@ -256,11 +256,29 @@ def admin_dashboard(request):
         "-start_time"
     )
 
+    total_bookings = bookings.count()
+
+    pending_bookings = bookings.filter(
+        status="pending"
+    ).count()
+
+    confirmed_bookings = bookings.filter(
+        status="confirmed"
+    ).count()
+
+    paid_payments = bookings.filter(
+        payment_status="paid"
+    ).count()
+
     return render(
         request,
         "bookings/admin_dashboard.html",
         {
-            "bookings": bookings
+            "bookings": bookings,
+            "total_bookings": total_bookings,
+            "pending_bookings": pending_bookings,
+            "confirmed_bookings": confirmed_bookings,
+            "paid_payments": paid_payments,
         }
     )
 
