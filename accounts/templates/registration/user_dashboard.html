@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>User Dashboard | TurfBook</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f6;
+            color: #1f2937;
+        }
+
+
+        /* NAVBAR */
+
+        header {
+            background: linear-gradient(135deg, #064e3b, #15803d);
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+
+        /* MAIN */
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 45px 0;
+        }
+
+
+        /* WELCOME */
+
+        .welcome-card {
+            background: linear-gradient(135deg, #ffffff, #ecfdf5);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 35px;
+        }
+
+        .welcome-card h1 {
+            margin: 0 0 12px;
+            color: #14532d;
+            font-size: 34px;
+        }
+
+        .welcome-card p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 17px;
+        }
+
+
+        /* DASHBOARD CARDS */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(260px, 1fr)
+            );
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            margin: 10px 0;
+            color: #14532d;
+        }
+
+        .card p {
+            color: #6b7280;
+            min-height: 45px;
+        }
+
+        .card a {
+            display: block;
+            text-decoration: none;
+            background: #15803d;
+            color: white;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .card a:hover {
+            background: #166534;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+            }
+
+            .container {
+                padding: 25px 0;
+            }
+
+            .welcome-card h1 {
+                font-size: 28px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <header>
+
+        <div class="logo">
+            🏏 TurfBook
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="{% url 'user_dashboard' %}">
+                🏠 Dashboard
+            </a>
+
+            <a href="{% url 'home' %}">
+                🏏 Browse Turfs
+            </a>
+
+            <a href="{% url 'my_bookings' %}">
+                📋 My Bookings
+            </a>
+
+            <a href="{% url 'logout' %}">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    <main class="container">
+
+
+        <section class="welcome-card">
+
+            <h1>
+                Welcome, {{ user.username }}! 👋
+            </h1>
+
+            <p>
+                Manage your turf bookings and discover available turfs.
+            </p>
+
+        </section>
+
+
+
+        <section class="dashboard-grid">
+
+
+            <div class="card">
+
+                <div class="card-icon">
+                    🏏
+                </div>
+
+                <h2>Browse Turfs</h2>
+
+                <p>
+                    Explore available cricket turfs and book your favourite one.
+                </p>
+
+                <a href="{% url 'home' %}">
+                    Browse Now →
+                </a>
+
+            </div>
+
+
+
+            <div class="card">
+
+                <div class="card-icon">
+                    📋
+                </div>
+
+                <h2>My Bookings</h2>
+
+                <p>
+                    View your upcoming, completed, and cancelled bookings.
+                </p>
+
+                <a href="{% url 'my_bookings' %}">
+                    View Bookings →
+                </a>
+
+            </div>
+
+
+
+            <div class="card">
+
+                <div class="card-icon">
+                    💳
+                </div>
+
+                <h2>Payments</h2>
+
+                <p>
+                    Check your booking payment status and payment options.
+                </p>
+
+                <a href="{% url 'my_bookings' %}">
+                    View Payments →
+                </a>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</body>
+
+</html>

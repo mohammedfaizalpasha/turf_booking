@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+```
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Browse Turfs | TurfBook</title>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f7f6;
+        color: #1f2937;
+    }
+
+    /* NAVBAR */
+
+    header {
+        background: linear-gradient(135deg, #064e3b, #15803d);
+        color: white;
+        padding: 18px 7%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 10px 15px;
+        border-radius: 8px;
+    }
+
+    .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* MAIN */
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: auto;
+        padding: 45px 0;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-title h1 {
+        color: #14532d;
+        margin-bottom: 10px;
+        font-size: 36px;
+    }
+
+    .page-title p {
+        color: #6b7280;
+        font-size: 17px;
+    }
+
+    /* TURF GRID */
+
+    .turf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+
+    .turf-card {
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+    }
+
+    .turf-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .turf-image {
+        height: 180px;
+        background: linear-gradient(135deg, #15803d, #064e3b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 70px;
+    }
+
+    .turf-info {
+        padding: 25px;
+    }
+
+    .turf-info h2 {
+        margin-top: 0;
+        color: #14532d;
+    }
+
+    .location {
+        color: #6b7280;
+        margin: 10px 0;
+    }
+
+    .price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #15803d;
+        margin: 15px 0;
+    }
+
+    .view-button {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        background: #15803d;
+        color: white;
+        padding: 14px;
+        border-radius: 10px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .view-button:hover {
+        background: #166534;
+    }
+
+    /* EMPTY STATE */
+
+    .empty-state {
+        background: white;
+        padding: 50px 20px;
+        text-align: center;
+        border-radius: 18px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state h2 {
+        color: #14532d;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 700px) {
+
+        header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .container {
+            padding: 30px 0;
+        }
+
+        .page-title h1 {
+            font-size: 28px;
+        }
+
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<header>
+
+    <div class="logo">
+        🏏 TurfBook
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{% url 'user_dashboard' %}">
+            🏠 Dashboard
+        </a>
+
+        <a href="{% url 'home' %}">
+            🏏 Browse Turfs
+        </a>
+
+        <a href="{% url 'my_bookings' %}">
+            📋 My Bookings
+        </a>
+
+        <a href="{% url 'logout' %}">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="page-title">
+
+        <h1>🏏 Available Turfs</h1>
+
+        <p>
+            Choose your favourite turf and book your preferred time slot.
+        </p>
+
+    </div>
+
+
+    {% if turfs %}
+
+        <div class="turf-grid">
+
+            {% for turf in turfs %}
+
+                <div class="turf-card">
+
+                    <div class="turf-image">
+                        🏏
+                    </div>
+
+                    <div class="turf-info">
+
+                        <h2>{{ turf.name }}</h2>
+
+                        <p class="location">
+                            📍 {{ turf.location }}
+                        </p>
+
+                        <p class="price">
+                            ₹{{ turf.price_per_hour }} / hour
+                        </p>
+
+                        <a
+                            class="view-button"
+                            href="{% url 'turf_detail' turf.id %}"
+                        >
+                            View & Book →
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h2>No Turfs Available</h2>
+
+            <p>
+                There are currently no active turfs available for booking.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</main>
+```
+
+</body>
+
+</html>

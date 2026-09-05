@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | TurfBook</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #064e3b, #15803d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #15803d;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #15803d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #166534;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .footer-link a {
+            color: #15803d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="logo">
+            🏏 TurfBook
+        </div>
+
+        <h1>👨‍💼 Admin Login</h1>
+
+        <p class="subtitle">
+            Sign in to manage your turf bookings.
+        </p>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <label>Username</label>
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter admin username"
+                required
+            >
+
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter password"
+                required
+            >
+
+
+            <button type="submit">
+                🔐 Login as Admin
+            </button>
+
+        </form>
+
+
+        <div class="footer-link">
+
+            <a href="{% url 'home' %}">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

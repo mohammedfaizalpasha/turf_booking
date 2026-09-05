@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | TurfBook</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #064e3b, #15803d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            padding: 50px 65px;
+            border-radius: 35px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 52px;
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            margin: 10px 0;
+            color: #111827;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 19px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 18px;
+            border: 1px solid #86efac;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 17px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        input {
+            width: 100%;
+            padding: 17px;
+            margin-bottom: 22px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 17px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #15803d;
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 18px;
+            background: #087a1a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 21px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .register-button:hover {
+            background: #066b16;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .login-link a {
+            color: #15803d;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+
+            .register-container {
+                padding: 40px 25px;
+            }
+
+            .logo {
+                font-size: 38px;
+            }
+
+            h1 {
+                font-size: 29px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="register-container">
+
+        <div class="logo">
+            🏏 TurfBook
+        </div>
+
+        <h1>👤 Create New Account</h1>
+
+        <p class="subtitle">
+            Join TurfBook and start booking your favourite turf.
+        </p>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                {% if message.tags == "success" %}
+
+                    <div class="success-message">
+                        ✅ {{ message }}
+                    </div>
+
+                {% else %}
+
+                    <div class="error-message">
+                        {{ message }}
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <label>Username</label>
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter your username"
+                required
+            >
+
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password1"
+                placeholder="Enter your password"
+                required
+            >
+
+
+            <label>Confirm Password</label>
+
+            <input
+                type="password"
+                name="password2"
+                placeholder="Confirm your password"
+                required
+            >
+
+
+            <button
+                type="submit"
+                class="register-button"
+            >
+                👤 Register Account
+            </button>
+
+        </form>
+
+
+        <div class="login-link">
+
+            <a href="{% url 'login' %}">
+                ← Back to Login
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

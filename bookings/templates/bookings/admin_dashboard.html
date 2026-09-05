@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Host Dashboard | TurfBook</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #15803d;
+        }
+
+        .top-button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .booking-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .pending {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .cancelled {
+            color: red;
+            font-weight: bold;
+        }
+
+        .payment-button {
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .payment-button:hover {
+            opacity: 0.9;
+        }
+
+        .booking-active {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🏏 Host / Admin Dashboard</h1>
+
+        <a href="{% url 'home' %}" class="top-button">
+            ← Back to Home
+        </a>
+
+        <h2>📋 All Turf Bookings</h2>
+
+
+        {% for booking in bookings %}
+
+            <div class="booking-card">
+
+                <h3>
+                    🏏 {{ booking.turf.name }}
+                </h3>
+
+
+                <div class="details">
+
+                    <div>
+
+                        <p>
+                            👤 <strong>User:</strong><br>
+                            {{ booking.user.username }}
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p>
+                            📅 <strong>Date:</strong><br>
+                            {{ booking.booking_date }}
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p>
+                            ⏰ <strong>Time:</strong><br>
+
+                            {{ booking.start_time|time:"h:i A" }}
+
+                            -
+
+                            {{ booking.end_time|time:"h:i A" }}
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p>
+                            📌 <strong>Booking Status:</strong><br>
+
+                            {% if booking.status == "cancelled" %}
+
+                                <span class="cancelled">
+                                    CANCELLED
+                                </span>
+
+                            {% else %}
+
+                                <span class="booking-active">
+                                    {{ booking.status|upper }}
+                                </span>
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <p>
+                            💳 <strong>Payment Status:</strong><br>
+
+                            {% if booking.payment_status == "paid" %}
+
+                                <span class="paid">
+                                    PAID
+                                </span>
+
+                            {% else %}
+
+                                <span class="pending">
+                                    {{ booking.payment_status|upper }}
+                                </span>
+
+                            {% endif %}
+
+                        </p>
+
+
+                        {% if booking.payment_status != "paid" and booking.status != "cancelled" %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'mark_payment_paid' booking.id %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="payment-button"
+                                >
+                                    💵 Mark as Paid
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        {% empty %}
+
+            <div class="booking-card">
+
+                <h3>
+                    No bookings are available yet.
+                </h3>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</body>
+
+</html>

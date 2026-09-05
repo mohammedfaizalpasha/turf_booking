@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>User Login | TurfBook</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #064e3b, #15803d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            padding: 55px 65px;
+            border-radius: 35px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 52px;
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 38px;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 20px;
+            margin-bottom: 35px;
+        }
+
+        .message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 18px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #15803d;
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: #087a1a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #066b16;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .links a {
+            color: #15803d;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+            margin: 15px;
+        }
+
+        @media (max-width: 600px) {
+
+            .login-container {
+                padding: 40px 25px;
+            }
+
+            .logo {
+                font-size: 38px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="logo">
+            🏏 TurfBook
+        </div>
+
+        <h1>👤 User Login</h1>
+
+        <p class="subtitle">
+            Sign in to book your favourite turf.
+        </p>
+
+        {% if form.errors %}
+            <div class="message">
+                Invalid username or password. Please try again.
+            </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="/accounts/login/">
+
+            {% csrf_token %}
+
+            <label>Username</label>
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter your username"
+                required
+            >
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit">
+                🔐 Login
+            </button>
+
+        </form>
+
+        <div class="links">
+
+            <a href="{% url 'register' %}">
+                📝 Create New Account
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
