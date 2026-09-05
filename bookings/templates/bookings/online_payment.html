@@ -63,11 +63,11 @@
     <h1>Complete Your Payment</h1>
 
     <p><strong>Turf:</strong> {{ booking.turf.name }}</p>
-    <p><strong>Date:</strong> {{ booking.date }}</p>
+    <p><strong>Date:</strong> {{ booking.booking_date }}</p>
     <p><strong>Time:</strong> {{ booking.start_time }}</p>
 
     <div class="amount">
-        ₹{{ booking.total_price }}
+     ₹{{ booking.turf.price_per_hour }}
     </div>
 
     <button id="pay-button" class="pay-button">
