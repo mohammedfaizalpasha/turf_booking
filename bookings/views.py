@@ -307,17 +307,16 @@ def online_payment(request, booking_id):
         }
     )
 
-    return render(
-        request,
-        "bookings/razorpay_payment.html",
-        {
-            "booking": booking,
-            "razorpay_order_id": razorpay_order["id"],
-            "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-            "amount": amount
-        }
-    )
-
+   return render(
+    request,
+    "bookings/online_payment.html",
+    {
+        "booking": booking,
+        "razorpay_order_id": razorpay_order["id"],
+        "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+        "amount": amount,
+    }
+)
 
 @login_required
 def verify_payment(request, booking_id):
