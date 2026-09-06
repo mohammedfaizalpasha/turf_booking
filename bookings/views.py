@@ -4,7 +4,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import (
+    login_required,
+    user_passes_test,
+)
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from datetime import datetime, timedelta
@@ -473,6 +476,12 @@ def confirm_booking(request, booking_id):
 
     return redirect("manage_bookings")
 
+def is_super_admin(user):
+
+    return (
+        user.is_authenticated
+        and user.is_superuser
+    )
 
 @user_passes_test(
     is_super_admin,
