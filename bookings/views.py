@@ -7,9 +7,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
+from datetime import datetime, timedelta
 
 from .models import Booking
-from turfs.models import Turf, TurfSlot
+from turfs.models import Turf
 
 
 razorpay_client = razorpay.Client(
