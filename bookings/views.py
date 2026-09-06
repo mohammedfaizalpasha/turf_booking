@@ -79,7 +79,7 @@ def create_booking(request):
             turf_id=turf.id
         )
 
-    already_booked = Booking.objects.filter(
+    active_booking_exists = Booking.objects.filter(
         turf=turf,
         booking_date=booking_date,
         start_time=start_time_obj
@@ -87,7 +87,7 @@ def create_booking(request):
         status="cancelled"
     ).exists()
 
-    if already_booked:
+    if active_booking_exists:
 
         messages.error(
             request,
@@ -96,6 +96,30 @@ def create_booking(request):
 
         return redirect(
             f"/turf/{turf.id}/?date={booking_date}"
+        )
+
+    cancelled_booking = Booking.objects.filter(
+        turf=turf,
+        booking_date=booking_date,
+        start_time=start_time_obj,
+        status="cancelled"
+    ).first()
+
+    if cancelled_booking:
+
+        cancelled_booking.user = request.user
+
+        cancelled_booking.end_time = end_time_obj
+
+        cancelled_booking.status = "pending"
+
+        cancelled_booking.payment_status = "pending"
+
+        cancelled_booking.save()
+
+        return redirect(
+            "payment",
+            booking_id=cancelled_booking.id
         )
 
     try:
