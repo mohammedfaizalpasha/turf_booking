@@ -7,11 +7,10 @@ from .models import Turf, TurfSlot
 class TurfAdmin(admin.ModelAdmin):
 
     list_display = (
+        "id",
         "name",
         "location",
         "price_per_hour",
-        "opening_time",
-        "closing_time",
         "is_active",
         "created_at",
     )
@@ -30,25 +29,19 @@ class TurfAdmin(admin.ModelAdmin):
 class TurfSlotAdmin(admin.ModelAdmin):
 
     list_display = (
+        "id",
         "turf",
         "date",
         "start_time",
         "end_time",
         "is_active",
-        "created_at",
     )
 
     list_filter = (
-        "turf",
         "date",
         "is_active",
     )
 
     search_fields = (
         "turf__name",
-    )
-
-    ordering = (
-        "date",
-        "start_time",
     )

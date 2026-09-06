@@ -2,26 +2,39 @@ from django.db import models
 
 
 class Turf(models.Model):
-    name = models.CharField(max_length=200)
-    location = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+
+    name = models.CharField(
+        max_length=200
+    )
+
+    location = models.CharField(
+        max_length=255
+    )
+
+    description = models.TextField(
+        blank=True
+    )
 
     price_per_hour = models.DecimalField(
         max_digits=10,
         decimal_places=2
     )
 
-    opening_time = models.TimeField()
-    closing_time = models.TimeField()
+    is_active = models.BooleanField(
+        default=True
+    )
 
-    is_active = models.BooleanField(default=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
+
         return self.name
-    
+
+
 class TurfSlot(models.Model):
+
     turf = models.ForeignKey(
         Turf,
         on_delete=models.CASCADE,
@@ -34,14 +47,18 @@ class TurfSlot(models.Model):
 
     end_time = models.TimeField()
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
     class Meta:
+
         constraints = [
+
             models.UniqueConstraint(
                 fields=[
                     "turf",
@@ -50,12 +67,19 @@ class TurfSlot(models.Model):
                 ],
                 name="unique_turf_slot"
             )
+
         ]
-        ordering = ["date", "start_time"]
+
+        ordering = [
+            "date",
+            "start_time"
+        ]
 
     def __str__(self):
+
         return (
             f"{self.turf.name} | "
             f"{self.date} | "
-            f"{self.start_time} - {self.end_time}"
-        )    
+            f"{self.start_time} - "
+            f"{self.end_time}"
+        )

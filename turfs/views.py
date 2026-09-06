@@ -14,7 +14,10 @@ from bookings.models import Booking
 
 def is_super_admin(user):
 
-    return user.is_authenticated and user.is_superuser
+    return (
+        user.is_authenticated
+        and user.is_superuser
+    )
 
 
 def home(request):
@@ -32,6 +35,10 @@ def home(request):
     )
 
 
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
 def superadmin_turfs(request):
 
     turfs = Turf.objects.all().order_by(
@@ -57,23 +64,17 @@ def add_turf(request):
 
         name = request.POST.get("name")
         location = request.POST.get("location")
-        description = request.POST.get("description")
+        description = request.POST.get(
+            "description"
+        )
         price_per_hour = request.POST.get(
             "price_per_hour"
-        )
-        opening_time = request.POST.get(
-            "opening_time"
-        )
-        closing_time = request.POST.get(
-            "closing_time"
         )
 
         if not all([
             name,
             location,
-            price_per_hour,
-            opening_time,
-            closing_time
+            price_per_hour
         ]):
 
             messages.error(
@@ -81,15 +82,15 @@ def add_turf(request):
                 "Please fill all required fields."
             )
 
-            return redirect("superadmin_turfs")
+            return redirect(
+                "superadmin_turfs"
+            )
 
         Turf.objects.create(
             name=name,
             location=location,
             description=description,
             price_per_hour=price_per_hour,
-            opening_time=opening_time,
-            closing_time=closing_time,
             is_active=True
         )
 
@@ -98,9 +99,9 @@ def add_turf(request):
             "Turf added successfully."
         )
 
-        return redirect("superadmin_turfs")
-
-    return redirect("superadmin_turfs")
+    return redirect(
+        "superadmin_turfs"
+    )
 
 
 @user_passes_test(
@@ -132,14 +133,6 @@ def edit_turf(request, turf_id):
             "price_per_hour"
         )
 
-        turf.opening_time = request.POST.get(
-            "opening_time"
-        )
-
-        turf.closing_time = request.POST.get(
-            "closing_time"
-        )
-
         turf.save()
 
         messages.success(
@@ -147,7 +140,9 @@ def edit_turf(request, turf_id):
             "Turf updated successfully."
         )
 
-    return redirect("superadmin_turfs")
+    return redirect(
+        "superadmin_turfs"
+    )
 
 
 @user_passes_test(
@@ -161,16 +156,20 @@ def toggle_turf(request, turf_id):
         id=turf_id
     )
 
-    turf.is_active = not turf.is_active
+    if request.method == "POST":
 
-    turf.save()
+        turf.is_active = not turf.is_active
 
-    messages.success(
-        request,
-        "Turf status updated successfully."
+        turf.save()
+
+        messages.success(
+            request,
+            "Turf status updated successfully."
+        )
+
+    return redirect(
+        "superadmin_turfs"
     )
-
-    return redirect("superadmin_turfs")
 
 
 @user_passes_test(
@@ -193,7 +192,9 @@ def delete_turf(request, turf_id):
             "Turf deleted successfully."
         )
 
-    return redirect("superadmin_turfs")
+    return redirect(
+        "superadmin_turfs"
+    )
 
 
 def turf_detail(request, turf_id):
@@ -210,18 +211,6 @@ def turf_detail(request, turf_id):
 
     slots = []
 
-    current_time = datetime.combine(
-        datetime.today().date(),
-        turf.opening_time
-    )
-
-    closing_time = datetime.combine(
-        datetime.today().date(),
-        turf.closing_time
-    )
-
-    booked_times = []
-
     if selected_date:
 
         booked_times = list(
@@ -236,28 +225,35 @@ def turf_detail(request, turf_id):
             )
         )
 
-    while current_time + timedelta(
-        hours=1
-    ) <= closing_time:
-
-        end_time = current_time + timedelta(
-            hours=1
+        current_time = datetime.combine(
+            datetime.today().date(),
+            datetime.min.time()
         )
 
-        is_booked = (
-            current_time.time()
-            in booked_times
-        )
+        for hour in range(24):
 
-        slots.append(
-            {
-                "start": current_time.time(),
-                "end": end_time.time(),
-                "is_booked": is_booked,
-            }
-        )
+            start_time = current_time.time()
 
-        current_time = end_time
+            end_datetime = (
+                current_time
+                + timedelta(hours=1)
+            )
+
+            end_time = end_datetime.time()
+
+            is_booked = (
+                start_time in booked_times
+            )
+
+            slots.append(
+                {
+                    "start": start_time,
+                    "end": end_time,
+                    "is_booked": is_booked,
+                }
+            )
+
+            current_time = end_datetime
 
     return render(
         request,
