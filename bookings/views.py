@@ -474,23 +474,16 @@ def confirm_booking(request, booking_id):
     return redirect("manage_bookings")
 
 
-@staff_member_required
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
 def admin_cancel_booking(request, booking_id):
 
-    booking = Booking.objects.filter(
+    booking = get_object_or_404(
+        Booking,
         id=booking_id
-    ).first()
-
-    if booking is None:
-
-        messages.error(
-            request,
-            "This booking no longer exists."
-        )
-
-        return redirect(
-            "manage_bookings"
-        )
+    )
 
     if request.method == "POST":
 
@@ -500,7 +493,8 @@ def admin_cancel_booking(request, booking_id):
 
         messages.success(
             request,
-            "Booking cancelled successfully."
+            "Booking cancelled successfully. "
+            "This slot is now available for other users."
         )
 
     return redirect(
