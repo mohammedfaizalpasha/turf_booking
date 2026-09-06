@@ -441,13 +441,26 @@
 
                     {% csrf_token %}
 
+                {% else %}
 
-                    <input
-                        type="hidden"
-                        name="turf_id"
-                        value="{{ turf.id }}"
-                    >
+    <button
+        type="submit"
+        class="slot-btn"
+        name="slot_id"
+        value="{{ slot.id }}"
+    >
 
+        {{ slot.start|time:"h:i A" }}
+        -
+        {{ slot.end|time:"h:i A" }}
+
+        <br>
+
+        Available
+
+    </button>
+
+{% endif %}
 
                     <input
                         type="hidden"

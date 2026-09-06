@@ -11,7 +11,7 @@ from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Booking
-from turfs.models import Turf
+from turfs.models import Turf, TurfSlot
 
 
 razorpay_client = razorpay.Client(
@@ -30,77 +30,56 @@ def create_booking(request):
 
     turf_id = request.POST.get("turf_id")
     booking_date = request.POST.get("booking_date")
-    start_time = request.POST.get("start_time")
+    slot_id = request.POST.get("slot_id")
 
-    if not turf_id:
-        messages.error(request, "Turf not found.")
+    if not turf_id or not booking_date or not slot_id:
+        messages.error(
+            request,
+            "Please select a valid date and time slot."
+        )
         return redirect("home")
-
-    if not booking_date:
-        messages.error(
-            request,
-            "Please select a booking date first."
-        )
-        return redirect(
-            "turf_detail",
-            turf_id=turf_id
-        )
-
-    if not start_time:
-        messages.error(
-            request,
-            "Please select a time slot."
-        )
-        return redirect(
-            "turf_detail",
-            turf_id=turf_id
-        )
 
     turf = get_object_or_404(
         Turf,
-        id=turf_id
+        id=turf_id,
+        is_active=True
     )
 
-    try:
-        start_time_obj = datetime.strptime(
-            start_time,
-            "%H:%M"
-        ).time()
+    slot = get_object_or_404(
+        TurfSlot,
+        id=slot_id,
+        turf=turf,
+        is_active=True
+    )
 
-        start_datetime = datetime.combine(
-            datetime.today().date(),
-            start_time_obj
+    already_booked = Booking.objects.filter(
+        turf=turf,
+        booking_date=booking_date,
+        start_time=slot.start_time
+    ).exclude(
+        status="cancelled"
+    ).exists()
+
+    if already_booked:
+
+        messages.error(
+            request,
+            "Sorry! This slot is already booked."
         )
 
-        end_time_obj = (
-            start_datetime + timedelta(hours=1)
-        ).time()
+        return redirect(
+            "turf_detail",
+            turf_id=turf.id
+        )
 
-        already_booked = Booking.objects.filter(
-            turf=turf,
-            booking_date=booking_date,
-            start_time=start_time_obj
-        ).exclude(
-            status="cancelled"
-        ).exists()
-
-        if already_booked:
-            messages.error(
-                request,
-                "Sorry! This time slot is already reserved."
-            )
-
-            return redirect(
-                "turf_detail",
-                turf_id=turf.id
-            )
+    try:
 
         booking = Booking.objects.create(
             user=request.user,
             turf=turf,
             booking_date=booking_date,
-            start_time=start_time_obj,
-            end_time=end_time_obj,
+            start_time=slot.start_time,
+            end_time=slot.end_time,
             status="pending",
             payment_status="pending"
         )
@@ -117,22 +96,10 @@ def create_booking(request):
             "This slot was just booked by another user."
         )
 
-    except Exception as error:
-
-        print(
-            "BOOKING ERROR:",
-            str(error)
+        return redirect(
+            "turf_detail",
+            turf_id=turf.id
         )
-
-        messages.error(
-            request,
-            "Booking failed. Please try again."
-        )
-
-    return redirect(
-        "turf_detail",
-        turf_id=turf.id
-    )
 
 
 @login_required
