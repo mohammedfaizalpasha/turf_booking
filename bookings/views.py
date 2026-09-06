@@ -28,9 +28,9 @@ def create_booking(request):
 
     turf_id = request.POST.get("turf_id")
     booking_date = request.POST.get("booking_date")
-    slot_id = request.POST.get("slot_id")
+    start_time = request.POST.get("start_time")
 
-    if not turf_id or not booking_date or not slot_id:
+    if not turf_id or not booking_date or not start_time:
 
         messages.error(
             request,
@@ -45,17 +45,40 @@ def create_booking(request):
         is_active=True
     )
 
-    slot = get_object_or_404(
-        TurfSlot,
-        id=slot_id,
-        turf=turf,
-        is_active=True
-    )
+    try:
+
+        start_time_obj = datetime.strptime(
+            start_time,
+            "%H:%M"
+        ).time()
+
+        start_datetime = datetime.combine(
+            datetime.today().date(),
+            start_time_obj
+        )
+
+        end_datetime = start_datetime + timedelta(
+            hours=1
+        )
+
+        end_time_obj = end_datetime.time()
+
+    except ValueError:
+
+        messages.error(
+            request,
+            "Invalid time slot."
+        )
+
+        return redirect(
+            "turf_detail",
+            turf_id=turf.id
+        )
 
     already_booked = Booking.objects.filter(
         turf=turf,
         booking_date=booking_date,
-        start_time=slot.start_time
+        start_time=start_time_obj
     ).exclude(
         status="cancelled"
     ).exists()
@@ -77,8 +100,8 @@ def create_booking(request):
             user=request.user,
             turf=turf,
             booking_date=booking_date,
-            start_time=slot.start_time,
-            end_time=slot.end_time,
+            start_time=start_time_obj,
+            end_time=end_time_obj,
             status="pending",
             payment_status="pending"
         )
@@ -98,7 +121,6 @@ def create_booking(request):
         return redirect(
             f"/turf/{turf.id}/?date={booking_date}"
         )
-
 
 @login_required
 def my_bookings(request):
