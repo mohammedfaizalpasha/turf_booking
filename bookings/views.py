@@ -1,7 +1,5 @@
 import razorpay
 
-from datetime import datetime, timedelta
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -33,10 +31,12 @@ def create_booking(request):
     slot_id = request.POST.get("slot_id")
 
     if not turf_id or not booking_date or not slot_id:
+
         messages.error(
             request,
             "Please select a valid date and time slot."
         )
+
         return redirect("home")
 
     turf = get_object_or_404(
@@ -68,8 +68,7 @@ def create_booking(request):
         )
 
         return redirect(
-            "turf_detail",
-            turf_id=turf.id
+            f"/turf/{turf.id}/?date={booking_date}"
         )
 
     try:
@@ -97,8 +96,7 @@ def create_booking(request):
         )
 
         return redirect(
-            "turf_detail",
-            turf_id=turf.id
+            f"/turf/{turf.id}/?date={booking_date}"
         )
 
 
@@ -396,6 +394,7 @@ def admin_login(request):
         "bookings/admin_login.html"
     )
 
+
 @staff_member_required
 def manage_bookings(request):
 
@@ -456,4 +455,4 @@ def admin_cancel_booking(request, booking_id):
             "Booking cancelled successfully."
         )
 
-    return redirect("manage_bookings")    
+    return redirect("manage_bookings")
