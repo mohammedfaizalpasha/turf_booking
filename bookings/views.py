@@ -395,3 +395,65 @@ def admin_login(request):
         request,
         "bookings/admin_login.html"
     )
+
+@staff_member_required
+def manage_bookings(request):
+
+    bookings = Booking.objects.all().order_by(
+        "-booking_date",
+        "-start_time"
+    )
+
+    return render(
+        request,
+        "bookings/manage_bookings.html",
+        {
+            "bookings": bookings
+        }
+    )
+
+
+@staff_member_required
+def confirm_booking(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    if request.method == "POST":
+
+        booking.status = "confirmed"
+
+        if booking.payment_status == "pending":
+            booking.payment_status = "paid"
+
+        booking.save()
+
+        messages.success(
+            request,
+            "Booking confirmed successfully."
+        )
+
+    return redirect("manage_bookings")
+
+
+@staff_member_required
+def admin_cancel_booking(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    if request.method == "POST":
+
+        booking.status = "cancelled"
+        booking.save()
+
+        messages.success(
+            request,
+            "Booking cancelled successfully."
+        )
+
+    return redirect("manage_bookings")    
