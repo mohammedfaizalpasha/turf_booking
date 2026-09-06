@@ -120,3 +120,47 @@ def user_dashboard(request):
         request,
         "registration/user_dashboard.html"
     )
+    
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
+
+
+@staff_member_required
+def manage_users(request):
+
+    users = User.objects.filter(
+        is_staff=False
+    ).order_by(
+        "-date_joined"
+    )
+
+    return render(
+        request,
+        "accounts/manage_users.html",
+        {
+            "users": users
+        }
+    )
+
+
+@staff_member_required
+def toggle_user_status(request, user_id):
+
+    user = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=False
+    )
+
+    if request.method == "POST":
+
+        user.is_active = not user.is_active
+
+        user.save()
+
+        messages.success(
+            request,
+            "User status updated successfully."
+        )
+
+    return redirect("manage_users")    
