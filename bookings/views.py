@@ -417,23 +417,37 @@ def admin_login(request):
         "bookings/admin_login.html"
     )
 
-
 @staff_member_required
 def manage_bookings(request):
 
-    bookings = Booking.objects.all().order_by(
+    bookings = Booking.objects.select_related(
+        "turf",
+        "user"
+    ).all().order_by(
         "-booking_date",
         "-start_time"
     )
+
+    total_bookings = bookings.count()
+
+    pending_bookings = bookings.filter(
+        status="pending"
+    ).count()
+
+    confirmed_bookings = bookings.filter(
+        status="confirmed"
+    ).count()
 
     return render(
         request,
         "bookings/manage_bookings.html",
         {
-            "bookings": bookings
+            "bookings": bookings,
+            "total_bookings": total_bookings,
+            "pending_bookings": pending_bookings,
+            "confirmed_bookings": confirmed_bookings,
         }
     )
-
 
 @staff_member_required
 def confirm_booking(request, booking_id):
@@ -463,14 +477,25 @@ def confirm_booking(request, booking_id):
 @staff_member_required
 def admin_cancel_booking(request, booking_id):
 
-    booking = get_object_or_404(
-        Booking,
+    booking = Booking.objects.filter(
         id=booking_id
-    )
+    ).first()
+
+    if booking is None:
+
+        messages.error(
+            request,
+            "This booking no longer exists."
+        )
+
+        return redirect(
+            "manage_bookings"
+        )
 
     if request.method == "POST":
 
         booking.status = "cancelled"
+
         booking.save()
 
         messages.success(
@@ -478,4 +503,6 @@ def admin_cancel_booking(request, booking_id):
             "Booking cancelled successfully."
         )
 
-    return redirect("manage_bookings")
+    return redirect(
+        "manage_bookings"
+    )
