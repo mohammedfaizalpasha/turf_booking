@@ -41,4 +41,22 @@ urlpatterns = [
         name="toggle_user_status"
     ),
 
+    path(
+        "manage-staff/",
+        views.manage_staff,
+        name="manage_staff"
+    ),
+
+    path(
+        "manage-staff/add/",
+        views.add_staff,
+        name="add_staff"
+    ),
+
+    path(
+        "manage-staff/<int:user_id>/toggle/",
+        views.toggle_staff_status,
+        name="toggle_staff_status"
+    ),
+
 ]

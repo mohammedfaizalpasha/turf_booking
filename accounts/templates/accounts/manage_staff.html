@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Staff Admins | TurfBook</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7f6;
+            color: #1f2937;
+        }
+
+        .topbar {
+            background: linear-gradient(
+                135deg,
+                #064e3b,
+                #022c22
+            );
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #4ade80;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0;
+            color: #14532d;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .add-btn {
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-form {
+            display: none;
+            background: white;
+            padding: 28px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .add-form.show {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(220px, 1fr)
+            );
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .save-btn {
+            margin-top: 20px;
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 18px;
+            overflow-x: auto;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            min-width: 750px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            text-align: left;
+            padding: 18px;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 18px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #14532d;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .super {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+
+        .toggle-btn {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .activate {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .deactivate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .protected {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .empty {
+            background: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 18px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 16px 5%;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            .header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="topbar">
+
+        <div class="brand">
+            🏏 <span>TurfBook</span>
+        </div>
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="back-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+
+        <div class="header">
+
+            <div>
+
+                <h1>
+                    Staff Admins
+                </h1>
+
+                <p class="subtitle">
+                    Add and manage staff administrators.
+                </p>
+
+            </div>
+
+            <button
+                class="add-btn"
+                onclick="toggleForm()"
+            >
+                + Add Staff Admin
+            </button>
+
+        </div>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <div
+            class="add-form"
+            id="addForm"
+        >
+
+            <h2>
+                Add New Staff Admin
+            </h2>
+
+            <form
+                method="POST"
+                action="{% url 'add_staff' %}"
+            >
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            name="username"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Create Staff Admin
+                </button>
+
+            </form>
+
+        </div>
+
+
+        {% if staff_members %}
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Username
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for staff in staff_members %}
+
+
+                            <tr>
+
+
+                                <td>
+
+                                    <span class="username">
+                                        👨‍💼 {{ staff.username }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ staff.email|default:"No email added" }}
+
+                                </td>
+
+
+                                <td>
+
+
+                                    {% if staff.is_superuser %}
+
+                                        <span class="badge super">
+                                            SUPER ADMIN
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge active">
+                                            STAFF ADMIN
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                                <td>
+
+
+                                    {% if staff.is_active %}
+
+                                        <span class="badge active">
+                                            ACTIVE
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge inactive">
+                                            INACTIVE
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                                <td>
+
+
+                                    {% if staff.is_superuser %}
+
+                                        <span class="protected">
+                                            Protected Account
+                                        </span>
+
+                                    {% else %}
+
+                                        <form
+                                            method="POST"
+                                            action="{% url 'toggle_staff_status' staff.id %}"
+                                        >
+
+                                            {% csrf_token %}
+
+
+                                            {% if staff.is_active %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="toggle-btn deactivate"
+                                                >
+                                                    Deactivate
+                                                </button>
+
+                                            {% else %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="toggle-btn activate"
+                                                >
+                                                    Activate
+                                                </button>
+
+                                            {% endif %}
+
+
+                                        </form>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                            </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+
+            <div class="empty">
+
+                <h2>
+                    No Staff Admins Yet
+                </h2>
+
+                <p>
+                    Click "Add Staff Admin" to create one.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <script>
+
+        function toggleForm() {
+
+            document
+                .getElementById("addForm")
+                .classList
+                .toggle("show");
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

@@ -164,3 +164,89 @@ def toggle_user_status(request, user_id):
         )
 
     return redirect("manage_users")    
+
+@staff_member_required
+def manage_staff_admins(request):
+
+    staff_admins = User.objects.filter(
+        is_staff=True,
+        is_superuser=False
+    ).order_by(
+        "-date_joined"
+    )
+
+    return render(
+        request,
+        "accounts/manage_staff_admins.html",
+        {
+            "staff_admins": staff_admins
+        }
+    )
+
+
+@staff_member_required
+def add_staff_admin(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if not username or not password:
+
+            messages.error(
+                request,
+                "Username and password are required."
+            )
+
+            return redirect("manage_staff_admins")
+
+        if User.objects.filter(
+            username=username
+        ).exists():
+
+            messages.error(
+                request,
+                "This username already exists."
+            )
+
+            return redirect("manage_staff_admins")
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            is_staff=True
+        )
+
+        messages.success(
+            request,
+            "Staff Admin created successfully."
+        )
+
+    return redirect("manage_staff_admins")
+
+
+@staff_member_required
+def toggle_staff_admin(request, user_id):
+
+    staff_admin = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=True,
+        is_superuser=False
+    )
+
+    if request.method == "POST":
+
+        staff_admin.is_active = not staff_admin.is_active
+
+        staff_admin.save()
+
+        messages.success(
+            request,
+            "Staff Admin status updated successfully."
+        )
+
+    return redirect("manage_staff_admins")
