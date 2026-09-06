@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
 
 
 def user_login(request):
@@ -120,10 +122,6 @@ def user_dashboard(request):
         request,
         "registration/user_dashboard.html"
     )
-    
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404
-
 
 @staff_member_required
 def manage_users(request):
@@ -250,3 +248,91 @@ def toggle_staff_admin(request, user_id):
         )
 
     return redirect("manage_staff_admins")
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
+
+
+@staff_member_required
+def manage_staff(request):
+
+    staff_members = User.objects.filter(
+        is_staff=True
+    ).order_by(
+        "-is_superuser",
+        "-date_joined"
+    )
+
+    return render(
+        request,
+        "accounts/manage_staff.html",
+        {
+            "staff_members": staff_members
+        }
+    )
+
+
+@staff_member_required
+def add_staff(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        if User.objects.filter(
+            username=username
+        ).exists():
+
+            messages.error(
+                request,
+                "Username already exists."
+            )
+
+            return redirect("manage_staff")
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            is_staff=True
+        )
+
+        messages.success(
+            request,
+            "Staff Admin created successfully."
+        )
+
+    return redirect("manage_staff")
+
+
+@staff_member_required
+def toggle_staff_status(request, staff_id):
+
+    staff = get_object_or_404(
+        User,
+        id=staff_id,
+        is_staff=True
+    )
+
+    if staff.is_superuser:
+
+        messages.error(
+            request,
+            "Super Admin accounts cannot be disabled."
+        )
+
+        return redirect("manage_staff")
+
+    if request.method == "POST":
+
+        staff.is_active = not staff.is_active
+        staff.save()
+
+        messages.success(
+            request,
+            "Staff Admin status updated successfully."
+        )
+
+    return redirect("manage_staff")
