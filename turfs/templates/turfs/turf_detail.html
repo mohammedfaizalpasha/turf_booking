@@ -1,458 +1,429 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>{{ turf.name }} | TurfBook</title>
+    <title>{{ turf.name }} | TurfBook</title>
 
-<style>
+    <style>
 
-    * {
-        box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        min-height: 100vh;
-        background: linear-gradient(
-            135deg,
-            #f0fdf4,
-            #ecfdf5
-        );
-        color: #1f2937;
-    }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7f6;
+            color: #1f2937;
+        }
 
-    .navbar {
-        background: #ffffff;
-        padding: 18px 8%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 15px rgba(
-            0,
-            0,
-            0,
-            0.08
-        );
-    }
+        .topbar {
+            background: linear-gradient(
+                135deg,
+                #064e3b,
+                #022c22
+            );
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
 
-    .logo {
-        font-size: 24px;
-        font-weight: bold;
-        color: #15803d;
-        text-decoration: none;
-    }
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    .back-btn {
-        background: #15803d;
-        color: white;
-        text-decoration: none;
-        padding: 10px 18px;
-        border-radius: 10px;
-    }
+        .brand span {
+            color: #4ade80;
+        }
 
-    .container {
-        width: 90%;
-        max-width: 1000px;
-        margin: 40px auto;
-    }
-
-    .hero-card,
-    .booking-card {
-        background: white;
-        border-radius: 22px;
-        padding: 35px;
-        box-shadow: 0 10px 30px rgba(
-            0,
-            0,
-            0,
-            0.08
-        );
-        margin-bottom: 25px;
-    }
-
-    .turf-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    h1 {
-        margin: 0;
-        color: #14532d;
-        font-size: 32px;
-    }
-
-    .price {
-        background: #dcfce7;
-        color: #166534;
-        padding: 12px 18px;
-        border-radius: 12px;
-        font-weight: bold;
-        font-size: 18px;
-    }
-
-    .location {
-        margin-top: 18px;
-        color: #6b7280;
-    }
-
-    .description {
-        margin-top: 15px;
-        line-height: 1.7;
-        color: #4b5563;
-    }
-
-    .booking-card h2 {
-        margin-top: 0;
-        color: #14532d;
-    }
-
-    .date-form {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 25px;
-    }
-
-    input[type="date"] {
-        flex: 1;
-        min-width: 200px;
-        padding: 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        font-size: 15px;
-    }
-
-    .check-btn {
-        border: none;
-        background: #15803d;
-        color: white;
-        padding: 14px 24px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-    .slots-heading {
-        margin-top: 35px;
-        color: #14532d;
-    }
-
-    .slot-container {
-        display: grid;
-        grid-template-columns: repeat(
-            auto-fit,
-            minmax(150px, 1fr)
-        );
-        gap: 15px;
-        margin-top: 20px;
-    }
-
-    .slot-btn {
-        border: none;
-        padding: 16px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    /* Available slot */
-
-    .available {
-        background: #dcfce7;
-        color: #166534;
-        border: 1px solid #86efac;
-    }
-
-    .available:hover {
-        background: #15803d;
-        color: white;
-        transform: translateY(-3px);
-    }
-
-    /* Booked slot */
-
-    .booked {
-        background: #fee2e2;
-        color: #b91c1c;
-        border: 1px solid #fca5a5;
-        cursor: not-allowed;
-    }
-
-    .message {
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 12px;
-    }
-
-    .success {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .error {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .help-text {
-        background: #f0fdf4;
-        border-left: 4px solid #22c55e;
-        padding: 16px;
-        border-radius: 8px;
-        color: #166534;
-        margin-top: 20px;
-    }
-
-    @media (max-width: 600px) {
-
-        .navbar {
-            padding: 15px 5%;
+        .back-btn {
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 16px;
+            border-radius: 10px;
         }
 
         .container {
-            width: 92%;
-            margin: 25px auto;
+            width: 90%;
+            max-width: 1100px;
+            margin: 35px auto;
         }
 
-        .hero-card,
+        .turf-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .turf-title {
+            margin: 0 0 15px;
+            color: #14532d;
+            font-size: 32px;
+        }
+
+        .description {
+            color: #6b7280;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 14px;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #14532d;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .map-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            background: #15803d;
+            color: white;
+            font-weight: bold;
+        }
+
         .booking-card {
-            padding: 22px;
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
-        h1 {
-            font-size: 26px;
+        .booking-title {
+            margin-top: 0;
+            color: #14532d;
+        }
+
+        .booking-subtitle {
+            color: #6b7280;
+            margin-bottom: 25px;
         }
 
         .date-form {
-            flex-direction: column;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .date-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
         }
 
         .check-btn {
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .slot {
+            border: 2px solid #e5e7eb;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .available {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .booked {
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+
+        .slot-time {
+            font-weight: bold;
+            color: #14532d;
+            margin-bottom: 10px;
+        }
+
+        .available-text {
+            color: #15803d;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .booked-text {
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .book-btn {
             width: 100%;
+            margin-top: 12px;
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
-        .slot-container {
-            grid-template-columns: 1fr 1fr;
+        .booked-btn {
+            width: 100%;
+            margin-top: 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: not-allowed;
         }
 
-    }
+        .empty-slots {
+            padding: 30px;
+            text-align: center;
+            color: #6b7280;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
 
-</style>
-```
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 16px 5%;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            .turf-card,
+            .booking-card {
+                padding: 22px;
+            }
+
+            .turf-title {
+                font-size: 26px;
+            }
+
+            .date-form {
+                flex-direction: column;
+            }
+
+            .check-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-```
-<nav class="navbar">
 
-    <a
-        href="{% url 'home' %}"
-        class="logo"
-    >
-        🏏 TurfBook
-    </a>
+    <div class="topbar">
 
-    <a
-        href="{% url 'home' %}"
-        class="back-btn"
-    >
-        ← Back
-    </a>
-
-</nav>
-
-
-<div class="container">
-
-
-    <div class="hero-card">
-
-        <div class="turf-title">
-
-            <h1>
-                🏏 {{ turf.name }}
-            </h1>
-
-            <div class="price">
-                ₹{{ turf.price_per_hour }} / hour
-            </div>
-
+        <div class="brand">
+            🏏 <span>TurfBook</span>
         </div>
 
-
-        <p class="location">
-            📍 {{ turf.location }}
-        </p>
-
-
-        {% if turf.description %}
-
-            <p class="description">
-                {{ turf.description }}
-            </p>
-
-        {% endif %}
-
+        <a
+            href="{% url 'home' %}"
+            class="back-btn"
+        >
+            ← Back
+        </a>
 
     </div>
 
 
-    {% if messages %}
+    <div class="container">
 
-        {% for message in messages %}
 
-            <div
-                class="message {{ message.tags }}"
-            >
-                {{ message }}
+        <div class="turf-card">
+
+            <h1 class="turf-title">
+                🏏 {{ turf.name }}
+            </h1>
+
+
+            {% if turf.description %}
+
+                <p class="description">
+                    {{ turf.description }}
+                </p>
+
+            {% endif %}
+
+
+            <div class="info-grid">
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        Price
+                    </div>
+
+                    <div class="info-value">
+                        ₹{{ turf.price_per_hour }} / hour
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        Location
+                    </div>
+
+                    <div class="info-value">
+                        📍 {{ turf.location }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label">
+                        Booking Duration
+                    </div>
+
+                    <div class="info-value">
+                        1 Hour per Slot
+                    </div>
+
+                </div>
+
+
             </div>
 
-        {% endfor %}
 
-    {% endif %}
+            {% if turf.map_url %}
 
+                <a
+                    href="{{ turf.map_url }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="map-btn"
+                >
+                    🗺️ View Location on Map
+                </a>
 
-    <div class="booking-card">
-
-        <h2>
-            Book Your Turf
-        </h2>
-
-
-        <div class="help-text">
-
-            📅 Select your preferred booking date and choose an available time slot.
-
-            <br><br>
-
-            🟢 Green = Available
-
-            <br>
-
-            🔴 Red = Already Booked
+            {% endif %}
 
         </div>
 
 
-        <form
-            method="GET"
-            class="date-form"
-        >
+        <div class="booking-card">
 
-            <input
-                type="date"
-                name="date"
-                id="booking-date"
-                value="{{ selected_date }}"
-                required
-            >
-
-            <button
-                type="submit"
-                class="check-btn"
-            >
-                Check Availability
-            </button>
-
-        </form>
-
-
-        {% if selected_date %}
-
-            <h2 class="slots-heading">
-
-                ⏰ Available Time Slots
-
+            <h2 class="booking-title">
+                Book Your Turf
             </h2>
 
-
-            {% if slots %}
-
-                <div class="slot-container">
-
-
-                    {% for slot in slots %}
+            <p class="booking-subtitle">
+                📅 Select your preferred booking date and check
+                the available time slots.
+            </p>
 
 
-                        {% if slot.is_booked %}
+            <form
+                method="GET"
+                class="date-form"
+            >
 
-                            <button
-                                type="button"
-                                class="slot-btn booked"
-                                disabled
+                <input
+                    type="date"
+                    name="date"
+                    class="date-input"
+                    value="{{ selected_date }}"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="check-btn"
+                >
+                    Check Availability
+                </button>
+
+            </form>
+
+
+            {% if selected_date %}
+
+                <h3>
+                    ⏰ Available Time Slots
+                </h3>
+
+
+                {% if slots %}
+
+                    <div class="slots-grid">
+
+
+                        {% for slot in slots %}
+
+
+                            <div
+                                class="slot {% if slot.is_booked %}booked{% else %}available{% endif %}"
                             >
 
-                                🔴
 
-                                {{ slot.start|time:"h:i A" }}
-
-                                -
-
-                                {{ slot.end|time:"h:i A" }}
-
-                                <br><br>
-
-                                Booked
-
-                            </button>
-
-
-                        {% else %}
-
-                            <form
-                                method="POST"
-                                action="{% url 'create_booking' %}"
-                            >
-
-                                {% csrf_token %}
-
-
-                                <input
-                                    type="hidden"
-                                    name="turf_id"
-                                    value="{{ turf.id }}"
-                                >
-
-
-                                <input
-                                    type="hidden"
-                                    name="booking_date"
-                                    value="{{ selected_date }}"
-                                >
-
-
-                                <input
-                                    type="hidden"
-                                    name="start_time"
-                                    value="{{ slot.start|time:'H:i' }}"
-                                >
-
-
-                                <button
-                                    type="submit"
-                                    class="slot-btn available"
-                                >
-
-                                    🟢
+                                <div class="slot-time">
 
                                     {{ slot.start|time:"h:i A" }}
 
@@ -460,64 +431,98 @@
 
                                     {{ slot.end|time:"h:i A" }}
 
-                                    <br><br>
-
-                                    Available
-
-                                </button>
-
-                            </form>
+                                </div>
 
 
-                        {% endif %}
+                                {% if slot.is_booked %}
+
+                                    <div class="booked-text">
+                                        🔴 Booked
+                                    </div>
+
+                                    <button
+                                        class="booked-btn"
+                                        disabled
+                                    >
+                                        Not Available
+                                    </button>
 
 
-                    {% endfor %}
+                                {% else %}
+
+                                    <div class="available-text">
+                                        🟢 Available
+                                    </div>
 
 
-                </div>
+                                    <form
+                                        method="POST"
+                                        action="{% url 'create_booking' %}"
+                                    >
+
+                                        {% csrf_token %}
+
+
+                                        <input
+                                            type="hidden"
+                                            name="turf_id"
+                                            value="{{ turf.id }}"
+                                        >
+
+
+                                        <input
+                                            type="hidden"
+                                            name="booking_date"
+                                            value="{{ selected_date }}"
+                                        >
+
+
+                                        <input
+                                            type="hidden"
+                                            name="start_time"
+                                            value="{{ slot.start|time:'H:i' }}"
+                                        >
+
+
+                                        <button
+                                            type="submit"
+                                            class="book-btn"
+                                        >
+                                            Book This Slot
+                                        </button>
+
+                                    </form>
+
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="empty-slots">
+                        No slots are available for this date.
+                    </div>
+
+                {% endif %}
+
 
             {% endif %}
 
 
-        {% else %}
-
-            <div class="help-text">
-
-                Select a date above and click
-
-                <strong>
-                    Check Availability
-                </strong>
-
-                to see all available time slots.
-
-            </div>
-
-
-        {% endif %}
+        </div>
 
 
     </div>
 
-
-</div>
-
-
-<script>
-
-    const dateInput =
-        document.getElementById(
-            "booking-date"
-        );
-
-    dateInput.min =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-</script>
-```
 
 </body>
 

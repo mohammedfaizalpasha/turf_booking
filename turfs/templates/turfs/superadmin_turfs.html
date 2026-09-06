@@ -1,661 +1,611 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Manage Turfs | TurfBook</title>
+    <title>Manage Turfs | TurfBook</title>
 
-<style>
+    <style>
 
-    * {
-        box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f7f6;
-        color: #1f2937;
-    }
-
-    .topbar {
-        background: #064e3b;
-        color: white;
-        padding: 18px 7%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .brand {
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .brand span {
-        color: #4ade80;
-    }
-
-    .back-btn {
-        color: white;
-        text-decoration: none;
-        background: rgba(255, 255, 255, 0.15);
-        padding: 10px 16px;
-        border-radius: 10px;
-    }
-
-    .container {
-        width: 90%;
-        max-width: 1200px;
-        margin: 35px auto;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 25px;
-        flex-wrap: wrap;
-    }
-
-    h1 {
-        margin: 0;
-        color: #14532d;
-    }
-
-    .subtitle {
-        color: #6b7280;
-        margin-top: 8px;
-    }
-
-    .add-btn {
-        background: #15803d;
-        color: white;
-        border: none;
-        padding: 13px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-    .add-btn:hover {
-        background: #166534;
-    }
-
-    .message {
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-
-    .success {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .error {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .add-form {
-        display: none;
-        background: white;
-        padding: 30px;
-        border-radius: 18px;
-        margin-bottom: 25px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-    }
-
-    .add-form.show {
-        display: block;
-    }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(
-            auto-fit,
-            minmax(220px, 1fr)
-        );
-        gap: 18px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-group.full {
-        grid-column: 1 / -1;
-    }
-
-    label {
-        font-size: 14px;
-        font-weight: bold;
-        margin-bottom: 8px;
-        color: #374151;
-    }
-
-    input,
-    textarea,
-    select {
-        padding: 13px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        font-size: 15px;
-    }
-
-    textarea {
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    .save-btn {
-        margin-top: 20px;
-        background: #15803d;
-        color: white;
-        border: none;
-        padding: 13px 22px;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .turf-grid {
-        display: grid;
-        grid-template-columns: repeat(
-            auto-fit,
-            minmax(300px, 1fr)
-        );
-        gap: 20px;
-    }
-
-    .turf-card {
-        background: white;
-        padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-    }
-
-    .turf-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-    }
-
-    .turf-card h2 {
-        margin: 0;
-        color: #14532d;
-        font-size: 21px;
-    }
-
-    .status {
-        padding: 6px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: bold;
-        height: fit-content;
-    }
-
-    .active {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .inactive {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .location {
-        color: #6b7280;
-        margin: 15px 0;
-    }
-
-    .price {
-        font-size: 20px;
-        font-weight: bold;
-        color: #15803d;
-        margin-bottom: 15px;
-    }
-
-    .schedule {
-        background: #f0fdf4;
-        padding: 12px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        color: #166534;
-    }
-
-    .actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .action-btn {
-        border: none;
-        padding: 10px 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .toggle-btn {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .delete-btn {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .empty {
-        background: white;
-        padding: 60px 20px;
-        text-align: center;
-        border-radius: 18px;
-        color: #6b7280;
-    }
-
-    @media (max-width: 600px) {
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7f6;
+            color: #1f2937;
+        }
 
         .topbar {
-            padding: 16px 5%;
+            background: linear-gradient(
+                135deg,
+                #064e3b,
+                #022c22
+            );
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #4ade80;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 16px;
+            border-radius: 10px;
         }
 
         .container {
-            width: 92%;
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
         }
 
         .header {
-            align-items: flex-start;
-            flex-direction: column;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0;
+            color: #14532d;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-top: 8px;
         }
 
         .add-btn {
-            width: 100%;
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
         }
 
-    }
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
 
-</style>
-```
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .add-form {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .add-form.show {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        input,
+        textarea {
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .save-btn {
+            margin-top: 20px;
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .turf-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .turf-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .turf-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .turf-card h2 {
+            margin: 0;
+            color: #14532d;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .location {
+            color: #6b7280;
+            margin: 15px 0;
+        }
+
+        .map-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #15803d;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #15803d;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .toggle-btn {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty {
+            background: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 18px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 16px 5%;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            .header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .add-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-```
-<div class="topbar">
 
-    <div class="brand">
-        🏏 <span>TurfBook</span>
+    <div class="topbar">
+
+        <div class="brand">
+            🏏 <span>TurfBook</span>
+        </div>
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="back-btn"
+        >
+            ← Dashboard
+        </a>
+
     </div>
 
-    <a
-        href="{% url 'admin_dashboard' %}"
-        class="back-btn"
-    >
-        ← Dashboard
-    </a>
 
-</div>
+    <div class="container">
 
 
-<div class="container">
+        <div class="header">
 
+            <div>
 
-    <div class="header">
+                <h1>
+                    Manage Turfs
+                </h1>
 
-        <div>
+                <p class="subtitle">
+                    Add and manage all your turf locations.
+                </p>
 
-            <h1>
-                Manage Turfs
-            </h1>
+            </div>
 
-            <p class="subtitle">
-                Add and manage all your turf locations and booking schedules.
-            </p>
+            <button
+                class="add-btn"
+                onclick="toggleForm()"
+            >
+                + Add New Turf
+            </button>
 
         </div>
 
-        <button
-            class="add-btn"
-            onclick="toggleForm()"
-        >
-            + Add New Turf
-        </button>
 
-    </div>
+        {% if messages %}
 
+            {% for message in messages %}
 
-    {% if messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
 
-        {% for message in messages %}
+            {% endfor %}
 
-            <div class="message {{ message.tags }}">
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
+        {% endif %}
 
 
-    <div
-        class="add-form"
-        id="addForm"
-    >
-
-        <h2>
-            Add New Turf
-        </h2>
-
-        <form
-            method="POST"
-            action="{% url 'add_turf' %}"
+        <div
+            class="add-form"
+            id="addForm"
         >
 
-            {% csrf_token %}
+            <h2>Add New Turf</h2>
 
-
-            <div class="form-grid">
-
-
-                <div class="form-group">
-
-                    <label>
-                        Turf Name
-                    </label>
-
-                    <input
-                        type="text"
-                        name="name"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Turf Location
-                    </label>
-
-                    <input
-                        type="text"
-                        name="location"
-                        id="location"
-                        placeholder="Select or enter location"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Price Per Hour
-                    </label>
-
-                    <input
-                        type="number"
-                        name="price_per_hour"
-                        min="1"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Booking Slot Duration
-                    </label>
-
-                    <select
-                        name="slot_duration"
-                        required
-                    >
-
-                        <option value="1">
-                            1 Hour
-                        </option>
-
-                        <option value="2">
-                            2 Hours
-                        </option>
-
-                        <option value="3">
-                            3 Hours
-                        </option>
-
-                        <option value="4">
-                            4 Hours
-                        </option>
-
-                        <option value="6">
-                            6 Hours
-                        </option>
-
-                        <option value="8">
-                            8 Hours
-                        </option>
-
-                        <option value="12">
-                            12 Hours
-                        </option>
-
-                        <option value="24">
-                            24 Hours
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="form-group full">
-
-                    <label>
-                        Description
-                    </label>
-
-                    <textarea
-                        name="description"
-                        placeholder="Enter turf description"
-                    ></textarea>
-
-                </div>
-
-
-            </div>
-
-
-            <button
-                type="submit"
-                class="save-btn"
+            <form
+                method="POST"
+                action="{% url 'add_turf' %}"
             >
-                Save Turf
-            </button>
 
-        </form>
+                {% csrf_token %}
 
-    </div>
+                <div class="form-grid">
 
 
-    {% if turfs %}
+                    <div class="form-group">
+
+                        <label>Turf Name</label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            required
+                        >
+
+                    </div>
 
 
-        <div class="turf-grid">
+                    <div class="form-group">
+
+                        <label>
+                            Location / Address
+                        </label>
+
+                        <input
+                            type="text"
+                            name="location"
+                            placeholder="Example: KG Halli, Bengaluru"
+                            required
+                        >
+
+                    </div>
 
 
-            {% for turf in turfs %}
+                    <div class="form-group">
+
+                        <label>
+                            Google Maps Location Link
+                        </label>
+
+                        <input
+                            type="url"
+                            name="map_url"
+                            placeholder="Paste Google Maps link"
+                        >
+
+                    </div>
 
 
-                <div class="turf-card">
+                    <div class="form-group">
+
+                        <label>
+                            Price Per Hour
+                        </label>
+
+                        <input
+                            type="number"
+                            name="price_per_hour"
+                            min="1"
+                            required
+                        >
+
+                    </div>
 
 
-                    <div class="turf-top">
+                    <div class="form-group full">
 
-                        <h2>
-                            🏏 {{ turf.name }}
-                        </h2>
+                        <label>Description</label>
+
+                        <textarea
+                            name="description"
+                            placeholder="Enter turf description"
+                        ></textarea>
+
+                    </div>
 
 
-                        {% if turf.is_active %}
+                </div>
 
-                            <span class="status active">
-                                ACTIVE
-                            </span>
 
-                        {% else %}
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Save Turf
+                </button>
 
-                            <span class="status inactive">
-                                INACTIVE
-                            </span>
+            </form>
+
+        </div>
+
+
+        {% if turfs %}
+
+            <div class="turf-grid">
+
+                {% for turf in turfs %}
+
+                    <div class="turf-card">
+
+
+                        <div class="turf-top">
+
+                            <h2>
+                                🏏 {{ turf.name }}
+                            </h2>
+
+
+                            {% if turf.is_active %}
+
+                                <span class="status active">
+                                    ACTIVE
+                                </span>
+
+                            {% else %}
+
+                                <span class="status inactive">
+                                    INACTIVE
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="location">
+                            📍 {{ turf.location }}
+                        </div>
+
+
+                        {% if turf.map_url %}
+
+                            <a
+                                href="{{ turf.map_url }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="map-link"
+                            >
+                                🗺️ View on Google Maps
+                            </a>
 
                         {% endif %}
 
 
-                    </div>
+                        <div class="price">
+                            ₹{{ turf.price_per_hour }} / hour
+                        </div>
 
 
-                    <div class="location">
+                        {% if turf.description %}
 
-                        📍 {{ turf.location }}
+                            <div class="description">
+                                {{ turf.description }}
+                            </div>
 
-                    </div>
-
-
-                    <div class="price">
-
-                        ₹{{ turf.price_per_hour }} / hour
-
-                    </div>
+                        {% endif %}
 
 
-                    <div class="schedule">
-
-                        ⏱️ Slot Duration:
-                        {{ turf.slot_duration }} Hour{{ turf.slot_duration|pluralize }}
-
-                    </div>
+                        <div class="actions">
 
 
-                    <div class="actions">
-
-
-                        <form
-                            method="POST"
-                            action="{% url 'toggle_turf' turf.id %}"
-                        >
-
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="action-btn toggle-btn"
+                            <form
+                                method="POST"
+                                action="{% url 'toggle_turf' turf.id %}"
                             >
 
-                                {% if turf.is_active %}
+                                {% csrf_token %}
 
-                                    Deactivate
+                                <button
+                                    type="submit"
+                                    class="action-btn toggle-btn"
+                                >
 
-                                {% else %}
+                                    {% if turf.is_active %}
+                                        Deactivate
+                                    {% else %}
+                                        Activate
+                                    {% endif %}
 
-                                    Activate
+                                </button>
 
-                                {% endif %}
-
-                            </button>
-
-                        </form>
+                            </form>
 
 
-                        <form
-                            method="POST"
-                            action="{% url 'delete_turf' turf.id %}"
-                            onsubmit="return confirm('Are you sure you want to delete this turf?');"
-                        >
-
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="action-btn delete-btn"
+                            <form
+                                method="POST"
+                                action="{% url 'delete_turf' turf.id %}"
+                                onsubmit="return confirm('Are you sure you want to delete this turf?');"
                             >
-                                Delete
-                            </button>
 
-                        </form>
+                                {% csrf_token %}
 
+                                <button
+                                    type="submit"
+                                    class="action-btn delete-btn"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+
+                        </div>
 
                     </div>
 
+                {% endfor %}
 
-                </div>
+            </div>
 
+        {% else %}
 
-            {% endfor %}
+            <div class="empty">
 
+                <h2>
+                    No Turfs Added Yet
+                </h2>
 
-        </div>
+                <p>
+                    Click "Add New Turf" to create your first turf.
+                </p>
 
+            </div>
 
-    {% else %}
+        {% endif %}
 
-
-        <div class="empty">
-
-            <h2>
-                No Turfs Added Yet
-            </h2>
-
-            <p>
-                Click "Add New Turf" to create your first turf.
-            </p>
-
-        </div>
+    </div>
 
 
-    {% endif %}
+    <script>
 
+        function toggleForm() {
 
-</div>
+            document
+                .getElementById("addForm")
+                .classList
+                .toggle("show");
 
+        }
 
-<script>
+    </script>
 
-    function toggleForm() {
-
-        document
-            .getElementById("addForm")
-            .classList
-            .toggle("show");
-
-    }
-
-</script>
-```
 
 </body>
 

@@ -64,6 +64,7 @@ def add_turf(request):
 
         name = request.POST.get("name")
         location = request.POST.get("location")
+        map_url = request.POST.get("map_url")
         description = request.POST.get(
             "description"
         )
@@ -89,6 +90,7 @@ def add_turf(request):
         Turf.objects.create(
             name=name,
             location=location,
+            map_url=map_url,
             description=description,
             price_per_hour=price_per_hour,
             is_active=True
@@ -123,6 +125,10 @@ def edit_turf(request, turf_id):
 
         turf.location = request.POST.get(
             "location"
+        )
+
+        turf.map_url = request.POST.get(
+            "map_url"
         )
 
         turf.description = request.POST.get(

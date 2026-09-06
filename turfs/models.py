@@ -11,6 +11,10 @@ class Turf(models.Model):
         max_length=255
     )
 
+    map_url = models.URLField(
+        blank=True
+    )
+
     description = models.TextField(
         blank=True
     )
