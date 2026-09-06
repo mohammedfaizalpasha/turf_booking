@@ -1,26 +1,86 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import logout
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import (
+    authenticate,
+    login,
+    logout,
+)
+from django.contrib.auth.decorators import (
+    login_required,
+    user_passes_test,
+)
+from django.contrib.auth.models import User
+from django.shortcuts import (
+    get_object_or_404,
+    redirect,
+    render,
+)
+
+
+def is_super_admin(user):
+
+    return (
+        user.is_authenticated
+        and user.is_superuser
+    )
+
+
+def register(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get(
+            "username"
+        ).strip()
+
+        email = request.POST.get(
+            "email"
+        ).strip()
+
+        password = request.POST.get(
+            "password"
+        )
+
+        if User.objects.filter(
+            username=username
+        ).exists():
+
+            messages.error(
+                request,
+                "Username already exists."
+            )
+
+            return redirect("register")
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        messages.success(
+            request,
+            "Account created successfully. Please login."
+        )
+
+        return redirect("login")
+
+    return render(
+        request,
+        "accounts/register.html"
+    )
 
 
 def user_login(request):
 
-    if request.user.is_authenticated:
-
-        if request.user.is_staff:
-            return redirect("admin_dashboard")
-
-        return redirect("user_dashboard")
-
     if request.method == "POST":
 
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = request.POST.get(
+            "username"
+        )
+
+        password = request.POST.get(
+            "password"
+        )
 
         user = authenticate(
             request,
@@ -30,19 +90,29 @@ def user_login(request):
 
         if user is not None:
 
-            # Prevent admin accounts from using User Login
-            if user.is_staff:
+            if not user.is_active:
 
                 messages.error(
                     request,
-                    "Please use the Admin Login page."
+                    "Your account has been deactivated."
                 )
 
                 return redirect("login")
 
-            login(request, user)
+            login(
+                request,
+                user
+            )
 
-            return redirect("user_dashboard")
+            if user.is_superuser or user.is_staff:
+
+                return redirect(
+                    "admin_dashboard"
+                )
+
+            return redirect(
+                "user_dashboard"
+            )
 
         messages.error(
             request,
@@ -51,59 +121,11 @@ def user_login(request):
 
     return render(
         request,
-        "registration/login.html"
-    )
-
-def register(request):
-
-    if request.method == "POST":
-
-        username = request.POST.get("username")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
-
-        # Check passwords
-        if password1 != password2:
-
-            messages.error(
-                request,
-                "Passwords do not match."
-            )
-
-            return redirect("register")
-
-        # Check username
-        if User.objects.filter(
-            username=username
-        ).exists():
-
-            messages.error(
-                request,
-                "Username already exists. Please choose another username."
-            )
-
-            return redirect("register")
-
-        # Create normal user account
-        User.objects.create_user(
-            username=username,
-            password=password1
-        )
-
-        messages.success(
-            request,
-            "Account created successfully! Please login."
-        )
-
-        # Go to User Login
-        return redirect("login")
-
-    return render(
-        request,
-        "registration/register.html"
+        "accounts/login.html"
     )
 
 
+@login_required
 def logout_view(request):
 
     logout(request)
@@ -113,21 +135,27 @@ def logout_view(request):
         "You have been logged out successfully."
     )
 
-    return redirect("login")
+    return redirect("home")
 
-@login_required(login_url="login")
+
+@login_required
 def user_dashboard(request):
 
     return render(
         request,
-        "registration/user_dashboard.html"
+        "accounts/dashboard.html"
     )
 
-@staff_member_required
+
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
 def manage_users(request):
 
     users = User.objects.filter(
-        is_staff=False
+        is_staff=False,
+        is_superuser=False
     ).order_by(
         "-date_joined"
     )
@@ -141,126 +169,62 @@ def manage_users(request):
     )
 
 
-@staff_member_required
-def toggle_user_status(request, user_id):
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
+def toggle_user_status(
+    request,
+    user_id
+):
+
+    if request.method != "POST":
+
+        return redirect(
+            "manage_users"
+        )
 
     user = get_object_or_404(
         User,
         id=user_id,
-        is_staff=False
-    )
-
-    if request.method == "POST":
-
-        user.is_active = not user.is_active
-
-        user.save()
-
-        messages.success(
-            request,
-            "User status updated successfully."
-        )
-
-    return redirect("manage_users")    
-
-@staff_member_required
-def manage_staff_admins(request):
-
-    staff_admins = User.objects.filter(
-        is_staff=True,
-        is_superuser=False
-    ).order_by(
-        "-date_joined"
-    )
-
-    return render(
-        request,
-        "accounts/manage_staff_admins.html",
-        {
-            "staff_admins": staff_admins
-        }
-    )
-
-
-@staff_member_required
-def add_staff_admin(request):
-
-    if request.method == "POST":
-
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
-        if not username or not password:
-
-            messages.error(
-                request,
-                "Username and password are required."
-            )
-
-            return redirect("manage_staff_admins")
-
-        if User.objects.filter(
-            username=username
-        ).exists():
-
-            messages.error(
-                request,
-                "This username already exists."
-            )
-
-            return redirect("manage_staff_admins")
-
-        User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            is_staff=True
-        )
-
-        messages.success(
-            request,
-            "Staff Admin created successfully."
-        )
-
-    return redirect("manage_staff_admins")
-
-
-@staff_member_required
-def toggle_staff_admin(request, user_id):
-
-    staff_admin = get_object_or_404(
-        User,
-        id=user_id,
-        is_staff=True,
+        is_staff=False,
         is_superuser=False
     )
 
-    if request.method == "POST":
+    user.is_active = not user.is_active
 
-        staff_admin.is_active = not staff_admin.is_active
+    user.save()
 
-        staff_admin.save()
+    if user.is_active:
 
         messages.success(
             request,
-            "Staff Admin status updated successfully."
+            f"{user.username} has been activated."
         )
 
-    return redirect("manage_staff_admins")
+    else:
 
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404
+        messages.success(
+            request,
+            f"{user.username} has been deactivated."
+        )
+
+    return redirect(
+        "manage_users"
+    )
 
 
-@staff_member_required
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
 def manage_staff(request):
 
     staff_members = User.objects.filter(
         is_staff=True
     ).order_by(
         "-is_superuser",
-        "-date_joined"
+        "username"
     )
 
     return render(
@@ -272,47 +236,94 @@ def manage_staff(request):
     )
 
 
-@staff_member_required
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
 def add_staff(request):
 
-    if request.method == "POST":
+    if request.method != "POST":
 
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
-        if User.objects.filter(
-            username=username
-        ).exists():
-
-            messages.error(
-                request,
-                "Username already exists."
-            )
-
-            return redirect("manage_staff")
-
-        User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            is_staff=True
+        return redirect(
+            "manage_staff"
         )
 
-        messages.success(
+    username = request.POST.get(
+        "username"
+    ).strip()
+
+    email = request.POST.get(
+        "email"
+    ).strip()
+
+    password = request.POST.get(
+        "password"
+    )
+
+    if not username or not password:
+
+        messages.error(
             request,
-            "Staff Admin created successfully."
+            "Username and password are required."
         )
 
-    return redirect("manage_staff")
+        return redirect(
+            "manage_staff"
+        )
+
+    if User.objects.filter(
+        username=username
+    ).exists():
+
+        messages.error(
+            request,
+            f'The username "{username}" already exists.'
+        )
+
+        return redirect(
+            "manage_staff"
+        )
+
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password
+    )
+
+    user.is_staff = True
+    user.is_active = True
+    user.is_superuser = False
+
+    user.save()
+
+    messages.success(
+        request,
+        f"Staff admin {username} created successfully."
+    )
+
+    return redirect(
+        "manage_staff"
+    )
 
 
-@staff_member_required
-def toggle_staff_status(request, staff_id):
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
+def toggle_staff_status(
+    request,
+    user_id
+):
+
+    if request.method != "POST":
+
+        return redirect(
+            "manage_staff"
+        )
 
     staff = get_object_or_404(
         User,
-        id=staff_id,
+        id=user_id,
         is_staff=True
     )
 
@@ -320,19 +331,31 @@ def toggle_staff_status(request, staff_id):
 
         messages.error(
             request,
-            "Super Admin accounts cannot be disabled."
+            "Super Admin accounts cannot be modified."
         )
 
-        return redirect("manage_staff")
+        return redirect(
+            "manage_staff"
+        )
 
-    if request.method == "POST":
+    staff.is_active = not staff.is_active
 
-        staff.is_active = not staff.is_active
-        staff.save()
+    staff.save()
+
+    if staff.is_active:
 
         messages.success(
             request,
-            "Staff Admin status updated successfully."
+            f"{staff.username} has been activated."
         )
 
-    return redirect("manage_staff")
+    else:
+
+        messages.success(
+            request,
+            f"{staff.username} has been deactivated."
+        )
+
+    return redirect(
+        "manage_staff"
+    )
