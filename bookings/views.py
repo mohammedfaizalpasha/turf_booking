@@ -28,10 +28,6 @@ razorpay_client = razorpay.Client(
 )
 
 
-# ==========================================
-# CREATE MULTIPLE SLOT BOOKING
-# ==========================================
-
 @login_required
 def create_booking(request):
 
@@ -41,58 +37,25 @@ def create_booking(request):
 
     turf_id = request.POST.get("turf_id")
 
-    booking_date_value = request.POST.get(
-        "booking_date"
-    )
+    booking_date = request.POST.get("booking_date")
 
-    start_times = request.POST.getlist(
-        "start_times"
-    )
+    start_times = request.POST.getlist("start_times")
 
-    # Remove empty and duplicate values
-    start_times = list(
-        dict.fromkeys(
-            time.strip()
-            for time in start_times
-            if time and time.strip()
-        )
-    )
-
-    # Backward compatibility for a single slot
+    # Support single slot if needed
     if not start_times:
 
-        single_start_time = request.POST.get(
-            "start_time"
-        )
+        single_start_time = request.POST.get("start_time")
 
         if single_start_time:
 
-            start_times = [
-                single_start_time.strip()
-            ]
+            start_times = [single_start_time]
 
-    # Basic validation
-    if not turf_id:
+    # Remove duplicate slot values
+    start_times = list(
+        dict.fromkeys(start_times)
+    )
 
-        messages.error(
-            request,
-            "Turf information is missing."
-        )
-
-        return redirect("home")
-
-    if not booking_date_value:
-
-        messages.error(
-            request,
-            "Please select a booking date."
-        )
-
-        return redirect(
-            f"/turf/{turf_id}/"
-        )
-
-    if not start_times:
+    if not turf_id or not booking_date or not start_times:
 
         messages.error(
             request,
@@ -100,26 +63,7 @@ def create_booking(request):
         )
 
         return redirect(
-            f"/turf/{turf_id}/?date={booking_date_value}"
-        )
-
-    # Convert date string to Python date object
-    try:
-
-        booking_date = datetime.strptime(
-            booking_date_value,
-            "%Y-%m-%d"
-        ).date()
-
-    except ValueError:
-
-        messages.error(
-            request,
-            "Invalid booking date."
-        )
-
-        return redirect(
-            f"/turf/{turf_id}/"
+            f"/turf/{turf_id}/?date={booking_date}"
         )
 
     turf = get_object_or_404(
@@ -128,50 +72,39 @@ def create_booking(request):
         is_active=True
     )
 
-    # One group ID for all selected slots
+    # Create one group ID for all selected slots
     booking_group_id = uuid.uuid4()
 
     created_booking_ids = []
 
     unavailable_slots = []
 
-    invalid_slots = []
-
-
-    # ==========================================
-    # CREATE EACH SELECTED SLOT
-    # ==========================================
-
     for start_time in start_times:
 
         try:
 
             start_time_obj = datetime.strptime(
-                start_time,
+                start_time.strip(),
                 "%H:%M"
             ).time()
 
             start_datetime = datetime.combine(
-                booking_date,
+                datetime.today().date(),
                 start_time_obj
             )
 
             end_time_obj = (
-                start_datetime
-                + timedelta(hours=1)
+                start_datetime + timedelta(hours=1)
             ).time()
 
         except ValueError:
 
-            invalid_slots.append(
-                start_time
-            )
+            unavailable_slots.append(start_time)
 
             continue
 
-
-        # Check whether the slot is already active
-        active_booking_exists = Booking.objects.filter(
+        # Check whether this exact slot is already active
+        existing_booking = Booking.objects.filter(
             turf=turf,
             booking_date=booking_date,
             start_time=start_time_obj
@@ -179,15 +112,11 @@ def create_booking(request):
             status="cancelled"
         ).exists()
 
+        if existing_booking:
 
-        if active_booking_exists:
-
-            unavailable_slots.append(
-                start_time
-            )
+            unavailable_slots.append(start_time)
 
             continue
-
 
         try:
 
@@ -208,12 +137,12 @@ def create_booking(request):
                 status="pending",
 
                 payment_status="pending"
+
             )
 
             created_booking_ids.append(
                 booking.id
             )
-
 
         except IntegrityError:
 
@@ -223,83 +152,48 @@ def create_booking(request):
 
             continue
 
+    # Show information about unavailable slots
+    if unavailable_slots:
 
-    # ==========================================
-    # NO SLOT CREATED
-    # ==========================================
-
-    if not created_booking_ids:
-
-        if unavailable_slots:
-
-            messages.error(
-                request,
-                "The selected slot(s) are no longer available. "
-                "Please select different slots."
-            )
-
-        elif invalid_slots:
-
-            messages.error(
-                request,
-                "One or more selected slots are invalid."
-            )
-
-        else:
-
-            messages.error(
-                request,
-                "Unable to create your booking. "
-                "Please try again."
-            )
-
-        return redirect(
-            f"/turf/{turf.id}/?date={booking_date_value}"
+        messages.warning(
+            request,
+            "Some selected slots were already booked: "
+            + ", ".join(unavailable_slots)
         )
 
+    # No booking was successfully created
+    if not created_booking_ids:
 
-    # ==========================================
-    # SAVE BOOKING GROUP IN SESSION
-    # ==========================================
+        messages.error(
+            request,
+            "None of the selected slots are currently available. "
+            "Please choose different slots."
+        )
 
+        return redirect(
+            f"/turf/{turf.id}/?date={booking_date}"
+        )
+
+    # Save booking IDs in session
     request.session[
         "selected_booking_ids"
     ] = created_booking_ids
 
     request.session[
         "booking_group_id"
-    ] = str(
-        booking_group_id
+    ] = str(booking_group_id)
+
+    messages.success(
+        request,
+        f"{len(created_booking_ids)} slot(s) added successfully. "
+        "Please choose your payment method."
     )
 
-
-    # ==========================================
-    # SUCCESS MESSAGE
-    # ==========================================
-
-    if unavailable_slots:
-
-        messages.warning(
-            request,
-            f"{len(created_booking_ids)} slot(s) were selected. "
-            f"Some slots were unavailable."
-        )
-
-    else:
-
-        messages.success(
-            request,
-            f"{len(created_booking_ids)} slot(s) selected successfully."
-        )
-
-
-    # IMPORTANT:
-    # Go directly to payment page
+    # IMPORTANT: Redirect to payment page
     return redirect(
         "payment",
         booking_id=created_booking_ids[0]
     )
-
 
 # ==========================================
 # MY BOOKINGS

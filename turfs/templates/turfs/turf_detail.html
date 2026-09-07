@@ -311,6 +311,29 @@
 
     <div class="container">
 
+        {% if messages %}
+
+    {% for message in messages %}
+
+        <div
+            style="
+                margin-bottom: 20px;
+                padding: 15px;
+                border-radius: 10px;
+                font-weight: bold;
+                background: #fef3c7;
+                color: #92400e;
+            "
+        >
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+{% endif %}
+
         <div class="turf-card">
 
             <h1 class="turf-title">
