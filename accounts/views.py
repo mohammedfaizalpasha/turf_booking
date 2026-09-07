@@ -143,7 +143,7 @@ def user_dashboard(request):
 
     return render(
         request,
-        "accounts/dashboard.html"
+        "accounts/user_dashboard.html"
     )
 
 
