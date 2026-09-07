@@ -107,6 +107,16 @@ urlpatterns = [
         views.confirm_booking,
         name="confirm_booking"
     ),
+    
+    # ==========================================
+# ADMIN BOOKING DELETE
+# ==========================================
+
+path(
+    "delete-booking/<int:booking_id>/",
+    views.delete_booking,
+    name="delete_booking"
+),
 
 
     # ==========================================
