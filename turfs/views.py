@@ -60,46 +60,56 @@ def superadmin_turfs(request):
 )
 def add_turf(request):
 
-    if request.method == "POST":
+    if request.method != "POST":
 
-        name = request.POST.get("name")
-        location = request.POST.get("location")
-        map_url = request.POST.get("map_url")
-        description = request.POST.get(
-            "description"
-        )
-        price_per_hour = request.POST.get(
-            "price_per_hour"
+        return redirect(
+            "superadmin_turfs"
         )
 
-        if not all([
-            name,
-            location,
-            price_per_hour
-        ]):
+    name = request.POST.get(
+        "name"
+    ).strip()
 
-            messages.error(
-                request,
-                "Please fill all required fields."
-            )
+    location = request.POST.get(
+        "location"
+    ).strip()
 
-            return redirect(
-                "superadmin_turfs"
-            )
+    map_url = request.POST.get(
+        "map_url"
+    ).strip()
 
-        Turf.objects.create(
-            name=name,
-            location=location,
-            map_url=map_url,
-            description=description,
-            price_per_hour=price_per_hour,
-            is_active=True
-        )
+    description = request.POST.get(
+        "description"
+    ).strip()
 
-        messages.success(
+    price_per_hour = request.POST.get(
+        "price_per_hour"
+    )
+
+    if not name or not location or not price_per_hour:
+
+        messages.error(
             request,
-            "Turf added successfully."
+            "Please fill all required fields."
         )
+
+        return redirect(
+            "superadmin_turfs"
+        )
+
+    Turf.objects.create(
+        name=name,
+        location=location,
+        map_url=map_url,
+        description=description,
+        price_per_hour=price_per_hour,
+        is_active=True
+    )
+
+    messages.success(
+        request,
+        "Turf added successfully."
+    )
 
     return redirect(
         "superadmin_turfs"
@@ -117,34 +127,55 @@ def edit_turf(request, turf_id):
         id=turf_id
     )
 
-    if request.method == "POST":
+    if request.method != "POST":
 
-        turf.name = request.POST.get(
-            "name"
+        return redirect(
+            "superadmin_turfs"
         )
 
-        turf.location = request.POST.get(
-            "location"
-        )
+    name = request.POST.get(
+        "name"
+    ).strip()
 
-        turf.map_url = request.POST.get(
-            "map_url"
-        )
+    location = request.POST.get(
+        "location"
+    ).strip()
 
-        turf.description = request.POST.get(
-            "description"
-        )
+    map_url = request.POST.get(
+        "map_url"
+    ).strip()
 
-        turf.price_per_hour = request.POST.get(
-            "price_per_hour"
-        )
+    description = request.POST.get(
+        "description"
+    ).strip()
 
-        turf.save()
+    price_per_hour = request.POST.get(
+        "price_per_hour"
+    )
 
-        messages.success(
+    if not name or not location or not price_per_hour:
+
+        messages.error(
             request,
-            "Turf updated successfully."
+            "Please fill all required fields."
         )
+
+        return redirect(
+            "superadmin_turfs"
+        )
+
+    turf.name = name
+    turf.location = location
+    turf.map_url = map_url
+    turf.description = description
+    turf.price_per_hour = price_per_hour
+
+    turf.save()
+
+    messages.success(
+        request,
+        f"{turf.name} updated successfully."
+    )
 
     return redirect(
         "superadmin_turfs"
@@ -157,20 +188,33 @@ def edit_turf(request, turf_id):
 )
 def toggle_turf(request, turf_id):
 
+    if request.method != "POST":
+
+        return redirect(
+            "superadmin_turfs"
+        )
+
     turf = get_object_or_404(
         Turf,
         id=turf_id
     )
 
-    if request.method == "POST":
+    turf.is_active = not turf.is_active
 
-        turf.is_active = not turf.is_active
+    turf.save()
 
-        turf.save()
+    if turf.is_active:
 
         messages.success(
             request,
-            "Turf status updated successfully."
+            f"{turf.name} has been activated."
+        )
+
+    else:
+
+        messages.success(
+            request,
+            f"{turf.name} has been deactivated."
         )
 
     return redirect(
@@ -184,19 +228,25 @@ def toggle_turf(request, turf_id):
 )
 def delete_turf(request, turf_id):
 
+    if request.method != "POST":
+
+        return redirect(
+            "superadmin_turfs"
+        )
+
     turf = get_object_or_404(
         Turf,
         id=turf_id
     )
 
-    if request.method == "POST":
+    turf_name = turf.name
 
-        turf.delete()
+    turf.delete()
 
-        messages.success(
-            request,
-            "Turf deleted successfully."
-        )
+    messages.success(
+        request,
+        f"{turf_name} deleted successfully."
+    )
 
     return redirect(
         "superadmin_turfs"

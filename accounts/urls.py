@@ -59,4 +59,10 @@ urlpatterns = [
         name="toggle_staff_status"
     ),
 
+    path(
+        "manage-staff/<int:user_id>/delete/",
+        views.delete_staff,
+        name="delete_staff"
+    ),
+
 ]

@@ -359,3 +359,49 @@ def toggle_staff_status(
     return redirect(
         "manage_staff"
     )
+
+
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
+def delete_staff(
+    request,
+    user_id
+):
+
+    if request.method != "POST":
+
+        return redirect(
+            "manage_staff"
+        )
+
+    staff = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=True
+    )
+
+    if staff.is_superuser:
+
+        messages.error(
+            request,
+            "Super Admin accounts cannot be deleted."
+        )
+
+        return redirect(
+            "manage_staff"
+        )
+
+    staff_username = staff.username
+
+    staff.delete()
+
+    messages.success(
+        request,
+        f"Staff admin {staff_username} has been deleted."
+    )
+
+    return redirect(
+        "manage_staff"
+    )

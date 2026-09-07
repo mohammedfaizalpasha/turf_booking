@@ -105,10 +105,11 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(
-                auto-fit,
-                minmax(220px, 1fr)
-            );
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(220px, 1fr)
+                );
             gap: 18px;
         }
 
@@ -203,7 +204,14 @@
             color: #6d28d9;
         }
 
-        .toggle-btn {
+        .action-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn,
+        .delete-btn {
             border: none;
             padding: 10px 14px;
             border-radius: 8px;
@@ -219,6 +227,11 @@
         .deactivate {
             background: #fef3c7;
             color: #92400e;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         .protected {
@@ -261,7 +274,6 @@
 
 <body>
 
-
     <div class="topbar">
 
         <div class="brand">
@@ -279,7 +291,6 @@
 
 
     <div class="container">
-
 
         <div class="header">
 
@@ -336,7 +347,6 @@
 
                 <div class="form-grid">
 
-
                     <div class="form-group">
 
                         <label>
@@ -380,7 +390,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -398,7 +407,6 @@
 
         {% if staff_members %}
 
-
             <div class="table-container">
 
                 <table>
@@ -407,25 +415,15 @@
 
                         <tr>
 
-                            <th>
-                                Username
-                            </th>
+                            <th>Username</th>
 
-                            <th>
-                                Email
-                            </th>
+                            <th>Email</th>
 
-                            <th>
-                                Role
-                            </th>
+                            <th>Role</th>
 
-                            <th>
-                                Status
-                            </th>
+                            <th>Status</th>
 
-                            <th>
-                                Action
-                            </th>
+                            <th>Actions</th>
 
                         </tr>
 
@@ -434,12 +432,9 @@
 
                     <tbody>
 
-
                         {% for staff in staff_members %}
 
-
                             <tr>
-
 
                                 <td>
 
@@ -459,7 +454,6 @@
 
                                 <td>
 
-
                                     {% if staff.is_superuser %}
 
                                         <span class="badge super">
@@ -474,12 +468,10 @@
 
                                     {% endif %}
 
-
                                 </td>
 
 
                                 <td>
-
 
                                     {% if staff.is_active %}
 
@@ -495,12 +487,10 @@
 
                                     {% endif %}
 
-
                                 </td>
 
 
                                 <td>
-
 
                                     {% if staff.is_superuser %}
 
@@ -510,48 +500,64 @@
 
                                     {% else %}
 
-                                        <form
-                                            method="POST"
-                                            action="{% url 'toggle_staff_status' staff.id %}"
-                                        >
+                                        <div class="action-group">
 
-                                            {% csrf_token %}
+                                            <form
+                                                method="POST"
+                                                action="{% url 'toggle_staff_status' staff.id %}"
+                                            >
+
+                                                {% csrf_token %}
+
+                                                {% if staff.is_active %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="toggle-btn deactivate"
+                                                    >
+                                                        Deactivate
+                                                    </button>
+
+                                                {% else %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="toggle-btn activate"
+                                                    >
+                                                        Activate
+                                                    </button>
+
+                                                {% endif %}
+
+                                            </form>
 
 
-                                            {% if staff.is_active %}
+                                            <form
+                                                method="POST"
+                                                action="{% url 'delete_staff' staff.id %}"
+                                                onsubmit="return confirm('Are you sure you want to permanently delete this staff admin?');"
+                                            >
+
+                                                {% csrf_token %}
 
                                                 <button
                                                     type="submit"
-                                                    class="toggle-btn deactivate"
+                                                    class="delete-btn"
                                                 >
-                                                    Deactivate
+                                                    Delete
                                                 </button>
 
-                                            {% else %}
+                                            </form>
 
-                                                <button
-                                                    type="submit"
-                                                    class="toggle-btn activate"
-                                                >
-                                                    Activate
-                                                </button>
-
-                                            {% endif %}
-
-
-                                        </form>
+                                        </div>
 
                                     {% endif %}
 
-
                                 </td>
-
 
                             </tr>
 
-
                         {% endfor %}
-
 
                     </tbody>
 
@@ -561,7 +567,6 @@
 
 
         {% else %}
-
 
             <div class="empty">
 
@@ -575,9 +580,7 @@
 
             </div>
 
-
         {% endif %}
-
 
     </div>
 
@@ -594,7 +597,6 @@
         }
 
     </script>
-
 
 </body>
 
