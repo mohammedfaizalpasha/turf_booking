@@ -110,6 +110,7 @@
         .summary-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #dcfce7;
             gap: 20px;
@@ -127,6 +128,25 @@
             font-weight: bold;
             color: #14532d;
             text-align: right;
+        }
+
+        .total-row {
+            margin-top: 15px;
+            padding-top: 20px;
+            border-top: 2px solid #86efac;
+            border-bottom: none;
+        }
+
+        .total-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #14532d;
+        }
+
+        .total-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #15803d;
         }
 
         .section-title {
@@ -229,6 +249,10 @@
 
         @media (max-width: 600px) {
 
+            .navbar {
+                padding: 15px 5%;
+            }
+
             .payment-card {
                 padding: 25px;
             }
@@ -239,11 +263,16 @@
 
             .summary-row {
                 flex-direction: column;
+                align-items: flex-start;
                 gap: 5px;
             }
 
             .summary-value {
                 text-align: left;
+            }
+
+            .payment-label {
+                padding: 18px;
             }
 
         }
@@ -288,73 +317,85 @@
                 </h1>
 
                 <p>
-                    Choose your preferred payment method
+                    Review your selected slots and choose
+                    your payment method.
                 </p>
 
             </div>
 
 
+            <!-- SELECTED SLOTS SUMMARY -->
+
             <div class="booking-summary">
 
                 <h2>
-                    🏏 Booking Summary
+                    🏏 Selected Slots
                 </h2>
 
 
+                {% for selected_booking in bookings %}
+
+
+                    <div class="summary-row">
+
+
+                        <span class="summary-label">
+
+                            {{ selected_booking.booking_date }}
+
+                            <br>
+
+                            {{ selected_booking.start_time|time:"h:i A" }}
+
+                            -
+
+                            {{ selected_booking.end_time|time:"h:i A" }}
+
+                        </span>
+
+
+                        <span class="summary-value">
+
+                            ₹{{ selected_booking.turf.price_per_hour }}
+
+                        </span>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+                <!-- TOTAL SLOTS -->
+
                 <div class="summary-row">
 
                     <span class="summary-label">
-                        Turf
+                        Total Slots
                     </span>
 
                     <span class="summary-value">
-                        {{ booking.turf.name }}
+                        {{ total_slots }}
                     </span>
 
                 </div>
 
 
-                <div class="summary-row">
+                <!-- TOTAL AMOUNT -->
 
-                    <span class="summary-label">
-                        Booking Date
-                    </span>
+                <div class="summary-row total-row">
 
-                    <span class="summary-value">
-                        {{ booking.booking_date }}
-                    </span>
-
-                </div>
-
-
-                <div class="summary-row">
-
-                    <span class="summary-label">
-                        Time
-                    </span>
-
-                    <span class="summary-value">
-
-                        {{ booking.start_time|time:"h:i A" }}
-                        -
-                        {{ booking.end_time|time:"h:i A" }}
-
-                    </span>
-
-                </div>
-
-
-                <div class="summary-row">
-
-                    <span class="summary-label">
+                    <span class="total-label">
                         Total Amount
                     </span>
 
-                    <span class="summary-value">
-                        ₹{{ booking.turf.price_per_hour }}
+                    <span class="total-value">
+                        ₹{{ total_amount }}
                     </span>
 
                 </div>
+
 
             </div>
 
@@ -377,9 +418,10 @@
                 <div class="payment-options">
 
 
-                    <!-- Online Payment -->
+                    <!-- ONLINE PAYMENT -->
 
                     <div class="payment-option">
+
 
                         <input
                             type="radio"
@@ -395,6 +437,7 @@
                             class="payment-label"
                         >
 
+
                             <div class="payment-icon">
                                 💳
                             </div>
@@ -402,25 +445,36 @@
 
                             <div class="payment-details">
 
+
                                 <h3>
                                     Online Payment
                                 </h3>
 
+
                                 <p>
-                                    Pay securely using Razorpay,
-                                    UPI, cards, or other supported methods.
+
+                                    Pay the total amount of
+                                    ₹{{ total_amount }}
+                                    securely using Razorpay,
+                                    UPI, cards, or other
+                                    supported methods.
+
                                 </p>
+
 
                             </div>
 
+
                         </label>
+
 
                     </div>
 
 
-                    <!-- Offline Payment -->
+                    <!-- OFFLINE PAYMENT -->
 
                     <div class="payment-option">
+
 
                         <input
                             type="radio"
@@ -435,6 +489,7 @@
                             class="payment-label"
                         >
 
+
                             <div class="payment-icon">
                                 🏏
                             </div>
@@ -442,19 +497,26 @@
 
                             <div class="payment-details">
 
+
                                 <h3>
                                     Offline Payment
                                 </h3>
 
+
                                 <p>
-                                    Submit your booking request and
-                                    wait for the administrator to
-                                    approve your payment.
+
+                                    Submit your booking request
+                                    and wait for the administrator
+                                    to approve your payment.
+
                                 </p>
+
 
                             </div>
 
+
                         </label>
+
 
                     </div>
 
