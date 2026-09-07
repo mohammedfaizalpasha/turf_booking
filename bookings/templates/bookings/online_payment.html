@@ -1,99 +1,249 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
 
-document.getElementById("pay-button").onclick = function (event) {
+<head>
 
-    event.preventDefault();
+    <meta charset="UTF-8">
 
-    var options = {
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-        "key": "{{ razorpay_key_id }}",
+    <title>Online Payment | TurfBook</title>
 
-        "amount": "{{ amount }}",
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-        "currency": "INR",
+    <style>
 
-        "name": "TurfBook",
-
-        "description": "Turf Booking Payment",
-
-        "order_id": "{{ razorpay_order_id }}",
-
-        "handler": function (response) {
-
-            var form = document.createElement("form");
-
-            form.method = "POST";
-
-            form.action =
-                "{% url 'verify_payment' booking.id %}";
-
-
-            var csrf = document.createElement("input");
-
-            csrf.type = "hidden";
-
-            csrf.name = "csrfmiddlewaretoken";
-
-            csrf.value = "{{ csrf_token }}";
-
-            form.appendChild(csrf);
-
-
-            var paymentId = document.createElement("input");
-
-            paymentId.type = "hidden";
-
-            paymentId.name = "razorpay_payment_id";
-
-            paymentId.value =
-                response.razorpay_payment_id;
-
-            form.appendChild(paymentId);
-
-
-            var orderId = document.createElement("input");
-
-            orderId.type = "hidden";
-
-            orderId.name = "razorpay_order_id";
-
-            orderId.value =
-                response.razorpay_order_id;
-
-            form.appendChild(orderId);
-
-
-            var signature = document.createElement("input");
-
-            signature.type = "hidden";
-
-            signature.name = "razorpay_signature";
-
-            signature.value =
-                response.razorpay_signature;
-
-            form.appendChild(signature);
-
-
-            document.body.appendChild(form);
-
-            form.submit();
-
-        },
-
-        "theme": {
-
-            "color": "#198754"
-
+        * {
+            box-sizing: border-box;
         }
 
-    };
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(
+                135deg,
+                #ecfdf5,
+                #f0fdf4,
+                #dcfce7
+            );
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-container {
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px
+                rgba(0, 0, 0, 0.12);
+            text-align: center;
+        }
+
+        h1 {
+            color: #14532d;
+        }
+
+        .details {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .details p {
+            margin: 12px 0;
+        }
+
+        #pay-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: #15803d;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #pay-button:hover {
+            background: #166534;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #15803d;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="payment-container">
+
+        <h1>Complete Payment</h1>
+
+        <p>
+            Secure payment powered by Razorpay
+        </p>
+
+        <div class="details">
+
+            <p>
+                <strong>Turf:</strong>
+                {{ booking.turf.name }}
+            </p>
+
+            <p>
+                <strong>Date:</strong>
+                {{ booking.booking_date }}
+            </p>
+
+            <p>
+                <strong>Amount:</strong>
+                ₹{{ booking.turf.price_per_hour }}
+            </p>
+
+        </div>
+
+        <button
+            id="pay-button"
+            type="button"
+        >
+            Pay ₹{{ booking.turf.price_per_hour }}
+        </button>
+
+        <a
+            href="{% url 'payment' booking.id %}"
+            class="back-link"
+        >
+            ← Back to Payment Options
+        </a>
+
+    </div>
 
 
-    var rzp = new Razorpay(options);
+    <script>
 
-    rzp.open();
+        document.getElementById("pay-button").onclick = function () {
 
-};
+            var options = {
 
-</script>
+                "key": "{{ razorpay_key_id }}",
+
+                "amount": "{{ amount }}",
+
+                "currency": "INR",
+
+                "name": "TurfBook",
+
+                "description": "Turf Booking Payment",
+
+                "order_id": "{{ razorpay_order_id }}",
+
+                "handler": function (response) {
+
+                    var form =
+                        document.createElement("form");
+
+                    form.method = "POST";
+
+                    form.action =
+                        "{% url 'verify_payment' booking.id %}";
+
+
+                    var csrf =
+                        document.createElement("input");
+
+                    csrf.type = "hidden";
+
+                    csrf.name =
+                        "csrfmiddlewaretoken";
+
+                    csrf.value =
+                        "{{ csrf_token }}";
+
+                    form.appendChild(csrf);
+
+
+                    var paymentId =
+                        document.createElement("input");
+
+                    paymentId.type = "hidden";
+
+                    paymentId.name =
+                        "razorpay_payment_id";
+
+                    paymentId.value =
+                        response.razorpay_payment_id;
+
+                    form.appendChild(paymentId);
+
+
+                    var orderId =
+                        document.createElement("input");
+
+                    orderId.type = "hidden";
+
+                    orderId.name =
+                        "razorpay_order_id";
+
+                    orderId.value =
+                        response.razorpay_order_id;
+
+                    form.appendChild(orderId);
+
+
+                    var signature =
+                        document.createElement("input");
+
+                    signature.type = "hidden";
+
+                    signature.name =
+                        "razorpay_signature";
+
+                    signature.value =
+                        response.razorpay_signature;
+
+                    form.appendChild(signature);
+
+
+                    document.body.appendChild(form);
+
+                    form.submit();
+
+                },
+
+                "theme": {
+
+                    "color": "#198754"
+
+                }
+
+            };
+
+
+            var rzp =
+                new Razorpay(options);
+
+            rzp.open();
+
+        };
+
+    </script>
+
+</body>
+
+</html>
