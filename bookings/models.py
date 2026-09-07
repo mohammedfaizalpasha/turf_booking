@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.db import models
 
@@ -22,6 +24,19 @@ class Booking(models.Model):
         ("paid", "Paid"),
         ("failed", "Failed"),
     ]
+
+    PAYMENT_PLATFORM_CHOICES = [
+        ("", "Not Selected"),
+        ("razorpay", "Razorpay"),
+        ("upi", "UPI"),
+        ("offline", "Offline Payment"),
+    ]
+
+    booking_group_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        db_index=True
+    )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -48,7 +63,8 @@ class Booking(models.Model):
     payment_method = models.CharField(
         max_length=20,
         choices=PAYMENT_METHOD_CHOICES,
-        default="offline"
+        blank=True,
+        default=""
     )
 
     payment_status = models.CharField(
@@ -57,11 +73,19 @@ class Booking(models.Model):
         default="pending"
     )
 
+    payment_platform = models.CharField(
+        max_length=50,
+        choices=PAYMENT_PLATFORM_CHOICES,
+        blank=True,
+        default=""
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
     class Meta:
+
         constraints = [
             models.UniqueConstraint(
                 fields=[
@@ -74,7 +98,9 @@ class Booking(models.Model):
         ]
 
     def __str__(self):
+
         return (
+            f"{self.user.username} | "
             f"{self.turf.name} | "
             f"{self.booking_date} | "
             f"{self.start_time}"

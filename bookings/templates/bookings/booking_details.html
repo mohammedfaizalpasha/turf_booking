@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Booking Details | TurfBook</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7f6;
+            color: #1f2937;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+        }
+
+        h1,
+        h2 {
+            color: #14532d;
+        }
+
+        .info {
+            padding: 15px;
+            background: #f8fafc;
+            margin: 12px 0;
+            border-radius: 10px;
+        }
+
+        .slot {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .total {
+            background: #14532d;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 18px;
+            background: #15803d;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <h1>
+                Customer Booking Details
+            </h1>
+
+
+            <div class="info">
+
+                <strong>Customer:</strong>
+
+                {{ booking.user.username }}
+
+            </div>
+
+
+            <div class="info">
+
+                <strong>Email:</strong>
+
+                {{ booking.user.email|default:"Not provided" }}
+
+            </div>
+
+
+            <div class="info">
+
+                <strong>Turf:</strong>
+
+                {{ booking.turf.name }}
+
+            </div>
+
+
+            <div class="info">
+
+                <strong>Date:</strong>
+
+                {{ booking.booking_date }}
+
+            </div>
+
+
+            <h2>
+                Selected Slots
+            </h2>
+
+
+            {% for item in bookings %}
+
+                <div class="slot">
+
+                    ⏰
+
+                    {{ item.start_time|time:"h:i A" }}
+
+                    -
+
+                    {{ item.end_time|time:"h:i A" }}
+
+                    &nbsp; | &nbsp;
+
+                    ₹{{ item.turf.price_per_hour }}
+
+                </div>
+
+            {% endfor %}
+
+
+            <div class="total">
+
+                <h2>
+                    Total Amount: ₹{{ total_amount }}
+                </h2>
+
+                <p>
+                    Total Slots:
+                    {{ total_slots }}
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'manage_bookings' %}"
+                class="back-btn"
+            >
+
+                ← Back to Manage Bookings
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,563 +1,598 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Manage Bookings | TurfBook</title>
+    <title>Manage Bookings | TurfBook</title>
 
-<style>
+    <style>
 
-    * {
-        box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f7f6;
-        color: #1f2937;
-    }
-
-    .topbar {
-        background: linear-gradient(
-            135deg,
-            #064e3b,
-            #022c22
-        );
-        color: white;
-        padding: 18px 7%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .brand {
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    .brand span {
-        color: #4ade80;
-    }
-
-    .back-btn {
-        color: white;
-        text-decoration: none;
-        background: rgba(255, 255, 255, 0.15);
-        padding: 10px 16px;
-        border-radius: 10px;
-    }
-
-    .container {
-        width: 90%;
-        max-width: 1300px;
-        margin: 35px auto;
-    }
-
-    .header {
-        margin-bottom: 30px;
-    }
-
-    h1 {
-        margin: 0;
-        color: #14532d;
-    }
-
-    .subtitle {
-        color: #6b7280;
-        margin-top: 8px;
-    }
-
-    .stats {
-        display: grid;
-        grid-template-columns:
-            repeat(auto-fit, minmax(200px, 1fr));
-        gap: 18px;
-        margin-bottom: 30px;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 22px;
-        border-radius: 16px;
-        box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.05);
-    }
-
-    .stat-card p {
-        margin: 0 0 10px;
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .stat-card h2 {
-        margin: 0;
-        color: #14532d;
-        font-size: 30px;
-    }
-
-    .message {
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-
-    .message.success {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .message.error {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .table-container {
-        background: white;
-        border-radius: 18px;
-        overflow-x: auto;
-        box-shadow:
-            0 8px 25px rgba(0, 0, 0, 0.05);
-    }
-
-    table {
-        width: 100%;
-        min-width: 1000px;
-        border-collapse: collapse;
-    }
-
-    th {
-        background: #f8fafc;
-        color: #64748b;
-        font-size: 13px;
-        text-align: left;
-        padding: 18px;
-    }
-
-    td {
-        padding: 18px;
-        border-top: 1px solid #f1f5f9;
-        font-size: 14px;
-    }
-
-    tr:hover {
-        background: #fafdfb;
-    }
-
-    .turf-name {
-        font-weight: bold;
-        color: #14532d;
-    }
-
-    .customer {
-        font-weight: 600;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 7px 11px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: bold;
-    }
-
-    .confirmed,
-    .paid {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .pending {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .cancelled,
-    .failed {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .online {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-
-    .offline {
-        background: #f3e8ff;
-        color: #7e22ce;
-    }
-
-    .actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .action-btn {
-        border: none;
-        padding: 9px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .confirm-btn {
-        background: #15803d;
-        color: white;
-    }
-
-    .cancel-btn {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .empty {
-        background: white;
-        padding: 60px 20px;
-        text-align: center;
-        border-radius: 18px;
-        color: #6b7280;
-    }
-
-    @media (max-width: 600px) {
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7f6;
+            color: #1f2937;
+        }
 
         .topbar {
-            padding: 16px 5%;
+            background: linear-gradient(
+                135deg,
+                #064e3b,
+                #022c22
+            );
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #4ade80;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 16px;
+            border-radius: 10px;
         }
 
         .container {
-            width: 92%;
+            width: 90%;
+            max-width: 1300px;
+            margin: 35px auto;
         }
 
         h1 {
-            font-size: 25px;
+            color: #14532d;
         }
 
-    }
+        .subtitle {
+            color: #6b7280;
+        }
 
-</style>
-```
+        .stats {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 16px;
+        }
+
+        .stat-card p {
+            margin: 0 0 10px;
+            color: #6b7280;
+        }
+
+        .stat-card h2 {
+            margin: 0;
+            color: #14532d;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 18px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .confirmed,
+        .paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .cancelled,
+        .failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .online {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .offline {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 9px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .view-btn {
+            background: #dbeafe;
+            color: #1d4ed8;
+            text-decoration: none;
+        }
+
+        .accept-btn {
+            background: #15803d;
+            color: white;
+        }
+
+        .reject-btn {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .paid-btn {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .unpaid-btn {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .empty {
+            background: white;
+            padding: 60px;
+            text-align: center;
+            border-radius: 18px;
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-```
-<div class="topbar">
+    <div class="topbar">
 
-    <div class="brand">
-        🏏 <span>TurfBook</span>
+        <div class="brand">
+            🏏 <span>TurfBook</span>
+        </div>
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="back-btn"
+        >
+            ← Dashboard
+        </a>
+
     </div>
 
-    <a
-        href="{% url 'admin_dashboard' %}"
-        class="back-btn"
-    >
-        ← Dashboard
-    </a>
 
-</div>
-
-
-<div class="container">
-
-    <div class="header">
+    <div class="container">
 
         <h1>
             Manage Bookings
         </h1>
 
         <p class="subtitle">
-            View, confirm and manage all customer bookings.
+            View, accept, reject and manage customer bookings.
         </p>
 
-    </div>
 
+        <div class="stats">
 
-    <div class="stats">
+            <div class="stat-card">
 
-        <div class="stat-card">
+                <p>Total Booking Groups</p>
 
-            <p>Total Bookings</p>
+                <h2>
+                    {{ total_bookings }}
+                </h2>
 
-            <h2>
-                {{ total_bookings }}
-            </h2>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <p>Pending</p>
-
-            <h2>
-                {{ pending_bookings }}
-            </h2>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <p>Confirmed</p>
-
-            <h2>
-                {{ confirmed_bookings }}
-            </h2>
-
-        </div>
-
-    </div>
-
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="message {{ message.tags }}">
-                {{ message }}
             </div>
 
-        {% endfor %}
 
-    {% endif %}
+            <div class="stat-card">
 
+                <p>Pending</p>
 
-    {% if bookings %}
+                <h2>
+                    {{ pending_bookings }}
+                </h2>
 
-        <div class="table-container">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>Turf</th>
-
-                        <th>Customer</th>
-
-                        <th>Date</th>
-
-                        <th>Time</th>
-
-                        <th>Payment</th>
-
-                        <th>Booking Status</th>
-
-                        <th>Actions</th>
-
-                    </tr>
-
-                </thead>
+            </div>
 
 
-                <tbody>
+            <div class="stat-card">
 
-                    {% for booking in bookings %}
+                <p>Confirmed</p>
+
+                <h2>
+                    {{ confirmed_bookings }}
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message {{ message.tags }}">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        {% if grouped_bookings %}
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
 
                         <tr>
 
-                            <td>
+                            <th>Customer</th>
 
-                                <span class="turf-name">
-                                    🏏 {{ booking.turf.name }}
-                                </span>
+                            <th>Turf</th>
 
-                            </td>
+                            <th>Date</th>
 
+                            <th>Slots</th>
 
-                            <td>
+                            <th>Total</th>
 
-                                <span class="customer">
-                                    {{ booking.user.username }}
-                                </span>
+                            <th>Payment</th>
 
-                            </td>
+                            <th>Status</th>
 
-
-                            <td>
-
-                                {{ booking.booking_date }}
-
-                            </td>
-
-
-                            <td>
-
-                                {{ booking.start_time|time:"h:i A" }}
-
-                                -
-
-                                {{ booking.end_time|time:"h:i A" }}
-
-                            </td>
-
-
-                            <td>
-
-                                {% if booking.payment_method == "online" %}
-
-                                    <span class="badge online">
-                                        ONLINE
-                                    </span>
-
-                                {% elif booking.payment_method == "offline" %}
-
-                                    <span class="badge offline">
-                                        OFFLINE
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="badge pending">
-                                        NOT SELECTED
-                                    </span>
-
-                                {% endif %}
-
-
-                                <br><br>
-
-
-                                {% if booking.payment_status == "paid" %}
-
-                                    <span class="badge paid">
-                                        PAID
-                                    </span>
-
-                                {% elif booking.payment_status == "failed" %}
-
-                                    <span class="badge failed">
-                                        FAILED
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="badge pending">
-                                        PENDING
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-
-                            <td>
-
-                                {% if booking.status == "confirmed" %}
-
-                                    <span class="badge confirmed">
-                                        CONFIRMED
-                                    </span>
-
-                                {% elif booking.status == "cancelled" %}
-
-                                    <span class="badge cancelled">
-                                        CANCELLED
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="badge pending">
-                                        PENDING
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-
-                            <td>
-
-                                <div class="actions">
-
-                                    {% if booking.status == "pending" %}
-
-                                        <form
-                                            method="POST"
-                                            action="{% url 'confirm_booking' booking.id %}"
-                                        >
-
-                                            {% csrf_token %}
-
-                                            <button
-                                                type="submit"
-                                                class="action-btn confirm-btn"
-                                            >
-                                                ✓ Confirm
-                                            </button>
-
-                                        </form>
-
-                                    {% endif %}
-
-
-                                    {% if booking.status != "cancelled" %}
-
-                                        <form
-                                            method="POST"
-                                            action="{% url 'admin_cancel_booking' booking.id %}"
-                                            onsubmit="return confirm('Are you sure you want to cancel this booking?');"
-                                        >
-
-                                            {% csrf_token %}
-
-                                            <button
-                                                type="submit"
-                                                class="action-btn cancel-btn"
-                                            >
-                                                Cancel
-                                            </button>
-
-                                        </form>
-
-                                    {% endif %}
-
-                                </div>
-
-                            </td>
+                            <th>Actions</th>
 
                         </tr>
 
-                    {% endfor %}
+                    </thead>
 
-                </tbody>
 
-            </table>
+                    <tbody>
 
-        </div>
+                        {% for group in grouped_bookings %}
 
-    {% else %}
+                            {% with booking=group.booking %}
 
-        <div class="empty">
+                                <tr>
 
-            <h2>
-                No Bookings Yet
-            </h2>
+                                    <td>
 
-            <p>
-                Customer bookings will appear here.
-            </p>
+                                        <strong>
+                                            {{ booking.user.username }}
+                                        </strong>
 
-        </div>
+                                        <br>
 
-    {% endif %}
+                                        <small>
+                                            {{ booking.user.email }}
+                                        </small>
 
-</div>
-```
+                                    </td>
+
+
+                                    <td>
+
+                                        🏏
+                                        {{ booking.turf.name }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ booking.booking_date }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ group.total_slots }}
+                                        Slot(s)
+
+                                    </td>
+
+
+                                    <td>
+
+                                        ₹{{ group.total_amount }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if booking.payment_method == "online" %}
+
+                                            <span class="badge online">
+
+                                                ONLINE
+
+                                            </span>
+
+                                            <br><br>
+
+                                            {% if booking.payment_status == "paid" %}
+
+                                                <span class="badge paid">
+
+                                                    PAID VIA
+                                                    {{ booking.payment_platform|upper }}
+
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="badge pending">
+
+                                                    PAYMENT PENDING
+
+                                                </span>
+
+                                            {% endif %}
+
+                                        {% elif booking.payment_method == "offline" %}
+
+                                            <span class="badge offline">
+
+                                                OFFLINE
+
+                                            </span>
+
+                                            <br><br>
+
+                                            <span
+                                                class="badge {{ booking.payment_status }}"
+                                            >
+
+                                                {{ booking.get_payment_status_display|upper }}
+
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge pending">
+
+                                                NOT SELECTED
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span
+                                            class="badge {{ booking.status }}"
+                                        >
+
+                                            {{ booking.get_status_display|upper }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="actions">
+
+
+                                            <a
+                                                href="{% url 'booking_details' booking.id %}"
+                                                class="action-btn view-btn"
+                                            >
+
+                                                View Details
+
+                                            </a>
+
+
+                                            {% if booking.status == "pending" %}
+
+                                                <form
+                                                    method="POST"
+                                                    action="{% url 'confirm_booking' booking.id %}"
+                                                >
+
+                                                    {% csrf_token %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="action-btn accept-btn"
+                                                    >
+
+                                                        ✓ Accept
+
+                                                    </button>
+
+                                                </form>
+
+
+                                                <form
+                                                    method="POST"
+                                                    action="{% url 'admin_cancel_booking' booking.id %}"
+                                                    onsubmit="return confirm('Reject this booking?');"
+                                                >
+
+                                                    {% csrf_token %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="action-btn reject-btn"
+                                                    >
+
+                                                        ✕ Reject
+
+                                                    </button>
+
+                                                </form>
+
+                                            {% endif %}
+
+
+                                            {% if booking.status == "confirmed" and booking.payment_method == "offline" %}
+
+                                                <form
+                                                    method="POST"
+                                                    action="{% url 'mark_payment_paid' booking.id %}"
+                                                >
+
+                                                    {% csrf_token %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="action-btn paid-btn"
+                                                    >
+
+                                                        Mark Paid
+
+                                                    </button>
+
+                                                </form>
+
+
+                                                <form
+                                                    method="POST"
+                                                    action="{% url 'mark_payment_unpaid' booking.id %}"
+                                                >
+
+                                                    {% csrf_token %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="action-btn unpaid-btn"
+                                                    >
+
+                                                        Mark Unpaid
+
+                                                    </button>
+
+                                                </form>
+
+                                            {% endif %}
+
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endwith %}
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty">
+
+                <h2>
+                    No Bookings Yet
+                </h2>
+
+                <p>
+                    Customer bookings will appear here.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
 
 </body>
 

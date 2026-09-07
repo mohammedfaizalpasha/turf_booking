@@ -36,6 +36,18 @@ urlpatterns = [
     ),
 
     path(
+        "online-payment/<int:booking_id>/",
+        views.online_payment,
+        name="online_payment"
+    ),
+
+    path(
+        "verify-payment/<int:booking_id>/",
+        views.verify_payment,
+        name="verify_payment"
+    ),
+
+    path(
         "admin-dashboard/",
         views.admin_dashboard,
         name="admin_dashboard"
@@ -45,6 +57,12 @@ urlpatterns = [
         "manage-bookings/",
         views.manage_bookings,
         name="manage_bookings"
+    ),
+
+    path(
+        "booking-details/<int:booking_id>/",
+        views.booking_details,
+        name="booking_details"
     ),
 
     path(
@@ -66,15 +84,9 @@ urlpatterns = [
     ),
 
     path(
-        "online-payment/<int:booking_id>/",
-        views.online_payment,
-        name="online_payment"
-    ),
-
-    path(
-        "verify-payment/<int:booking_id>/",
-        views.verify_payment,
-        name="verify_payment"
+        "mark-payment-unpaid/<int:booking_id>/",
+        views.mark_payment_unpaid,
+        name="mark_payment_unpaid"
     ),
 
     path(
