@@ -1,26 +1,193 @@
-from decimal import Decimal
-
 import razorpay
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import (
-    get_object_or_404,
-    redirect,
-    render,
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import (
+    login_required,
+    user_passes_test,
 )
+from django.db import IntegrityError
+from django.shortcuts import get_object_or_404, redirect, render
+from datetime import datetime, timedelta
 
 from .models import Booking
+from turfs.models import Turf
 
 
-# Razorpay Client
 razorpay_client = razorpay.Client(
     auth=(
         settings.RAZORPAY_KEY_ID,
         settings.RAZORPAY_KEY_SECRET
     )
 )
+
+
+@login_required
+def create_booking(request):
+
+    if request.method != "POST":
+        return redirect("home")
+
+    turf_id = request.POST.get("turf_id")
+    booking_date = request.POST.get("booking_date")
+    start_time = request.POST.get("start_time")
+
+    if not turf_id or not booking_date or not start_time:
+
+        messages.error(
+            request,
+            "Please select a valid date and time slot."
+        )
+
+        return redirect("home")
+
+    turf = get_object_or_404(
+        Turf,
+        id=turf_id,
+        is_active=True
+    )
+
+    try:
+
+        start_time_obj = datetime.strptime(
+            start_time,
+            "%H:%M"
+        ).time()
+
+        start_datetime = datetime.combine(
+            datetime.today().date(),
+            start_time_obj
+        )
+
+        end_datetime = start_datetime + timedelta(
+            hours=1
+        )
+
+        end_time_obj = end_datetime.time()
+
+    except ValueError:
+
+        messages.error(
+            request,
+            "Invalid time slot."
+        )
+
+        return redirect(
+            "turf_detail",
+            turf_id=turf.id
+        )
+
+    active_booking_exists = Booking.objects.filter(
+        turf=turf,
+        booking_date=booking_date,
+        start_time=start_time_obj
+    ).exclude(
+        status="cancelled"
+    ).exists()
+
+    if active_booking_exists:
+
+        messages.error(
+            request,
+            "Sorry! This slot is already booked."
+        )
+
+        return redirect(
+            f"/turf/{turf.id}/?date={booking_date}"
+        )
+
+    cancelled_booking = Booking.objects.filter(
+        turf=turf,
+        booking_date=booking_date,
+        start_time=start_time_obj,
+        status="cancelled"
+    ).first()
+
+    if cancelled_booking:
+
+        cancelled_booking.user = request.user
+
+        cancelled_booking.end_time = end_time_obj
+
+        cancelled_booking.status = "pending"
+
+        cancelled_booking.payment_status = "pending"
+
+        cancelled_booking.save()
+
+        return redirect(
+            "payment",
+            booking_id=cancelled_booking.id
+        )
+
+    try:
+
+        booking = Booking.objects.create(
+            user=request.user,
+            turf=turf,
+            booking_date=booking_date,
+            start_time=start_time_obj,
+            end_time=end_time_obj,
+            status="pending",
+            payment_status="pending"
+        )
+
+        return redirect(
+            "payment",
+            booking_id=booking.id
+        )
+
+    except IntegrityError:
+
+        messages.error(
+            request,
+            "This slot was just booked by another user."
+        )
+
+        return redirect(
+            f"/turf/{turf.id}/?date={booking_date}"
+        )
+
+@login_required
+def my_bookings(request):
+
+    bookings = Booking.objects.filter(
+        user=request.user
+    ).order_by(
+        "-booking_date",
+        "-start_time"
+    )
+
+    return render(
+        request,
+        "bookings/my_bookings.html",
+        {
+            "bookings": bookings
+        }
+    )
+
+
+@login_required
+def cancel_booking(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        booking.delete()
+
+        messages.success(
+            request,
+            "Your booking has been cancelled and removed successfully."
+        )
+
+    return redirect("my_bookings")
 
 
 @login_required
@@ -76,18 +243,14 @@ def process_payment(request, booking_id):
         booking.payment_method = "offline"
         booking.payment_status = "pending"
         booking.status = "pending"
-
         booking.save()
 
         messages.info(
             request,
-            "Offline booking submitted successfully. "
-            "Please wait for admin approval."
+            "Offline booking submitted successfully. Please wait for admin approval."
         )
 
-        return redirect(
-            "my_bookings"
-        )
+        return redirect("my_bookings")
 
     messages.error(
         request,
@@ -100,6 +263,63 @@ def process_payment(request, booking_id):
     )
 
 
+@staff_member_required
+def admin_dashboard(request):
+
+    bookings = Booking.objects.all().order_by(
+        "-booking_date",
+        "-start_time"
+    )
+
+    total_bookings = bookings.count()
+
+    pending_bookings = bookings.filter(
+        status="pending"
+    ).count()
+
+    confirmed_bookings = bookings.filter(
+        status="confirmed"
+    ).count()
+
+    paid_payments = bookings.filter(
+        payment_status="paid"
+    ).count()
+
+    return render(
+        request,
+        "bookings/admin_dashboard.html",
+        {
+            "bookings": bookings,
+            "total_bookings": total_bookings,
+            "pending_bookings": pending_bookings,
+            "confirmed_bookings": confirmed_bookings,
+            "paid_payments": paid_payments,
+        }
+    )
+
+
+@staff_member_required
+def mark_payment_paid(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    if request.method == "POST":
+
+        booking.payment_status = "paid"
+        booking.status = "confirmed"
+        booking.save()
+
+        messages.success(
+            request,
+            "Booking approved and payment marked as paid."
+        )
+
+    return redirect("admin_dashboard")
+
+
 @login_required
 def online_payment(request, booking_id):
 
@@ -109,9 +329,8 @@ def online_payment(request, booking_id):
         user=request.user
     )
 
-    # Amount in paise
     amount = int(
-        Decimal(booking.turf.price_per_hour) * 100
+        booking.turf.price_per_hour * 100
     )
 
     razorpay_order = razorpay_client.order.create(
@@ -138,10 +357,7 @@ def online_payment(request, booking_id):
 def verify_payment(request, booking_id):
 
     if request.method != "POST":
-
-        return redirect(
-            "my_bookings"
-        )
+        return redirect("my_bookings")
 
     booking = get_object_or_404(
         Booking,
@@ -174,7 +390,6 @@ def verify_payment(request, booking_id):
         booking.payment_method = "online"
         booking.payment_status = "paid"
         booking.status = "confirmed"
-
         booking.save()
 
         messages.success(
@@ -182,14 +397,11 @@ def verify_payment(request, booking_id):
             "Payment successful! Your booking is confirmed."
         )
 
-        return redirect(
-            "my_bookings"
-        )
+        return redirect("my_bookings")
 
     except razorpay.errors.SignatureVerificationError:
 
         booking.payment_status = "failed"
-
         booking.save()
 
         messages.error(
@@ -201,3 +413,123 @@ def verify_payment(request, booking_id):
             "payment",
             booking_id=booking.id
         )
+
+
+def admin_login(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
+
+        if user is not None and user.is_staff:
+
+            login(request, user)
+
+            return redirect("admin_dashboard")
+
+        messages.error(
+            request,
+            "Invalid admin username or password."
+        )
+
+    return render(
+        request,
+        "bookings/admin_login.html"
+    )
+
+@staff_member_required
+def manage_bookings(request):
+
+    bookings = Booking.objects.select_related(
+        "turf",
+        "user"
+    ).all().order_by(
+        "-booking_date",
+        "-start_time"
+    )
+
+    total_bookings = bookings.count()
+
+    pending_bookings = bookings.filter(
+        status="pending"
+    ).count()
+
+    confirmed_bookings = bookings.filter(
+        status="confirmed"
+    ).count()
+
+    return render(
+        request,
+        "bookings/manage_bookings.html",
+        {
+            "bookings": bookings,
+            "total_bookings": total_bookings,
+            "pending_bookings": pending_bookings,
+            "confirmed_bookings": confirmed_bookings,
+        }
+    )
+
+@staff_member_required
+def confirm_booking(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    if request.method == "POST":
+
+        booking.status = "confirmed"
+
+        if booking.payment_status == "pending":
+            booking.payment_status = "paid"
+
+        booking.save()
+
+        messages.success(
+            request,
+            "Booking confirmed successfully."
+        )
+
+    return redirect("manage_bookings")
+
+def is_super_admin(user):
+
+    return (
+        user.is_authenticated
+        and user.is_superuser
+    )
+
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
+def admin_cancel_booking(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    if request.method == "POST":
+
+        booking.status = "cancelled"
+
+        booking.save()
+
+        messages.success(
+            request,
+            "Booking cancelled successfully. "
+            "This slot is now available for other users."
+        )
+
+    return redirect(
+        "manage_bookings"
+    )
