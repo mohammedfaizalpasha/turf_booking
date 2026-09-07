@@ -31,17 +31,21 @@ def create_booking(request):
         return redirect("home")
 
     turf_id = request.POST.get("turf_id")
-    booking_date = request.POST.get("booking_date")
-    start_time = request.POST.get("start_time")
 
-    if not turf_id or not booking_date or not start_time:
+    booking_date = request.POST.get("booking_date")
+
+    start_times = request.POST.getlist("start_times")
+
+
+    if not turf_id or not booking_date or not start_times:
 
         messages.error(
             request,
-            "Please select a valid date and time slot."
+            "Please select at least one time slot."
         )
 
         return redirect("home")
+
 
     turf = get_object_or_404(
         Turf,
@@ -49,106 +53,121 @@ def create_booking(request):
         is_active=True
     )
 
-    try:
 
-        start_time_obj = datetime.strptime(
-            start_time,
-            "%H:%M"
-        ).time()
+    created_booking_ids = []
 
-        start_datetime = datetime.combine(
-            datetime.today().date(),
-            start_time_obj
-        )
 
-        end_datetime = start_datetime + timedelta(
-            hours=1
-        )
+    for start_time in start_times:
 
-        end_time_obj = end_datetime.time()
+        try:
 
-    except ValueError:
+            start_time_obj = datetime.strptime(
+                start_time,
+                "%H:%M"
+            ).time()
 
-        messages.error(
-            request,
-            "Invalid time slot."
-        )
 
-        return redirect(
-            "turf_detail",
-            turf_id=turf.id
-        )
+            start_datetime = datetime.combine(
+                datetime.today().date(),
+                start_time_obj
+            )
 
-    active_booking_exists = Booking.objects.filter(
-        turf=turf,
-        booking_date=booking_date,
-        start_time=start_time_obj
-    ).exclude(
-        status="cancelled"
-    ).exists()
 
-    if active_booking_exists:
+            end_datetime = (
+                start_datetime + timedelta(hours=1)
+            )
 
-        messages.error(
-            request,
-            "Sorry! This slot is already booked."
-        )
 
-        return redirect(
-            f"/turf/{turf.id}/?date={booking_date}"
-        )
+            end_time_obj = end_datetime.time()
 
-    cancelled_booking = Booking.objects.filter(
-        turf=turf,
-        booking_date=booking_date,
-        start_time=start_time_obj,
-        status="cancelled"
-    ).first()
 
-    if cancelled_booking:
+        except ValueError:
 
-        cancelled_booking.user = request.user
+            messages.error(
+                request,
+                "Invalid time slot selected."
+            )
 
-        cancelled_booking.end_time = end_time_obj
+            continue
 
-        cancelled_booking.status = "pending"
 
-        cancelled_booking.payment_status = "pending"
-
-        cancelled_booking.save()
-
-        return redirect(
-            "payment",
-            booking_id=cancelled_booking.id
-        )
-
-    try:
-
-        booking = Booking.objects.create(
-            user=request.user,
+        slot_already_booked = Booking.objects.filter(
             turf=turf,
             booking_date=booking_date,
-            start_time=start_time_obj,
-            end_time=end_time_obj,
-            status="pending",
-            payment_status="pending"
-        )
+            start_time=start_time_obj
+        ).exclude(
+            status="cancelled"
+        ).exists()
 
-        return redirect(
-            "payment",
-            booking_id=booking.id
-        )
 
-    except IntegrityError:
+        if slot_already_booked:
+
+            messages.warning(
+                request,
+                f"Slot {start_time} is already booked."
+            )
+
+            continue
+
+
+        try:
+
+            booking = Booking.objects.create(
+
+                user=request.user,
+
+                turf=turf,
+
+                booking_date=booking_date,
+
+                start_time=start_time_obj,
+
+                end_time=end_time_obj,
+
+                status="pending",
+
+                payment_status="pending"
+
+            )
+
+
+            created_booking_ids.append(
+                booking.id
+            )
+
+
+        except IntegrityError:
+
+            messages.warning(
+                request,
+                f"Slot {start_time} was just booked by another user."
+            )
+
+            continue
+
+
+    if not created_booking_ids:
 
         messages.error(
             request,
-            "This slot was just booked by another user."
+            "None of the selected slots are available."
         )
 
         return redirect(
             f"/turf/{turf.id}/?date={booking_date}"
         )
+
+
+    messages.success(
+        request,
+        f"{len(created_booking_ids)} slot(s) selected successfully."
+    )
+
+
+    return redirect(
+        "payment",
+        booking_id=created_booking_ids[0]
+    )
 
 @login_required
 def my_bookings(request):
@@ -329,29 +348,44 @@ def online_payment(request, booking_id):
         user=request.user
     )
 
-    amount = int(
-        booking.turf.price_per_hour * 100
-    )
+    try:
 
-    razorpay_order = razorpay_client.order.create(
-        {
-            "amount": amount,
-            "currency": "INR",
-            "payment_capture": 1
-        }
-    )
+        amount = int(
+            float(booking.turf.price_per_hour) * 100
+        )
 
-    return render(
-        request,
-        "bookings/online_payment.html",
-        {
-            "booking": booking,
-            "razorpay_order_id": razorpay_order["id"],
-            "razorpay_key_id": settings.RAZORPAY_KEY_ID,
-            "amount": amount,
-        }
-    )
+        razorpay_order = razorpay_client.order.create(
+            {
+                "amount": amount,
+                "currency": "INR",
+                "payment_capture": 1
+            }
+        )
 
+        return render(
+            request,
+            "bookings/online_payment.html",
+            {
+                "booking": booking,
+                "razorpay_order_id": razorpay_order["id"],
+                "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+                "amount": amount,
+            }
+        )
+
+    except Exception as e:
+
+        print("RAZORPAY ERROR:", str(e))
+
+        messages.error(
+            request,
+            f"Unable to start payment: {str(e)}"
+        )
+
+        return redirect(
+            "payment",
+            booking_id=booking.id
+        )
 
 @login_required
 def verify_payment(request, booking_id):
