@@ -204,16 +204,38 @@
             font-weight: bold;
         }
 
+        .slot-checkbox {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #14532d;
+        }
+
+        .slot-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         .book-btn {
             width: 100%;
-            margin-top: 12px;
+            margin-top: 25px;
             background: #15803d;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        .book-btn:hover {
+            background: #166534;
         }
 
         .booked-btn {
@@ -271,7 +293,6 @@
 
 <body>
 
-
     <div class="topbar">
 
         <div class="brand">
@@ -290,7 +311,6 @@
 
     <div class="container">
 
-
         <div class="turf-card">
 
             <h1 class="turf-title">
@@ -308,7 +328,6 @@
 
 
             <div class="info-grid">
-
 
                 <div class="info-box">
 
@@ -348,7 +367,6 @@
 
                 </div>
 
-
             </div>
 
 
@@ -375,10 +393,12 @@
             </h2>
 
             <p class="booking-subtitle">
-                📅 Select your preferred booking date and check
-                the available time slots.
+                📅 Select your preferred booking date and choose
+                one or more available time slots.
             </p>
 
+
+            <!-- DATE SELECTION -->
 
             <form
                 method="GET"
@@ -412,146 +432,129 @@
 
                 {% if slots %}
 
-                    <div class="slots-grid">
+                    <!-- MULTIPLE SLOT BOOKING FORM -->
+
+                    <form
+                        method="POST"
+                        action="{% url 'create_booking' %}"
+                    >
+
+                        {% csrf_token %}
 
 
-                        {% for slot in slots %}
+                        <input
+                            type="hidden"
+                            name="turf_id"
+                            value="{{ turf.id }}"
+                        >
 
 
-                            <div
-                                class="slot {% if slot.is_booked %}booked{% else %}available{% endif %}"
-                            >
+                        <input
+                            type="hidden"
+                            name="booking_date"
+                            value="{{ selected_date }}"
+                        >
 
 
-                                <div class="slot-time">
+                        <div class="slots-grid">
 
-                                    {{ slot.start|time:"h:i A" }}
 
-                                    -
+                            {% for slot in slots %}
 
-                                    {{ slot.end|time:"h:i A" }}
+
+                                <div
+                                    class="slot {% if slot.is_booked %}booked{% else %}available{% endif %}"
+                                >
+
+                                    <div class="slot-time">
+
+                                        {{ slot.start|time:"h:i A" }}
+
+                                        -
+
+                                        {{ slot.end|time:"h:i A" }}
+
+                                    </div>
+
+
+                                    {% if slot.is_booked %}
+
+                                        <div class="booked-text">
+                                            🔴 Booked
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            class="booked-btn"
+                                            disabled
+                                        >
+                                            Not Available
+                                        </button>
+
+
+                                    {% else %}
+
+                                        <div class="available-text">
+                                            🟢 Available
+                                        </div>
+
+
+                                        <label
+                                            class="slot-checkbox"
+                                        >
+
+                                            <input
+                                                type="checkbox"
+                                                name="start_times"
+                                                value="{{ slot.start|time:'H:i' }}"
+                                            >
+
+                                            Select Slot
+
+                                        </label>
+
+
+                                    {% endif %}
+
 
                                 </div>
 
 
-                                {% if slot.is_booked %}
-
-                                    <div class="booked-text">
-                                        🔴 Booked
-                                    </div>
-
-                                    <button
-                                        class="booked-btn"
-                                        disabled
-                                    >
-                                        Not Available
-                                    </button>
-                                    {% if slots %}
-
-    <form
-        method="POST"
-        action="{% url 'create_booking' %}"
-    >
-
-        {% csrf_token %}
-
-        <input
-            type="hidden"
-            name="turf_id"
-            value="{{ turf.id }}"
-        >
-
-        <input
-            type="hidden"
-            name="booking_date"
-            value="{{ selected_date }}"
-        >
-
-        <div class="slots-grid">
-
-            {% for slot in slots %}
-
-                <div
-                    class="slot {% if slot.is_booked %}booked{% else %}available{% endif %}"
-                >
-
-                    <div class="slot-time">
-
-                        {{ slot.start|time:"h:i A" }}
-
-                        -
-
-                        {{ slot.end|time:"h:i A" }}
-
-                    </div>
+                            {% endfor %}
 
 
-                    {% if slot.is_booked %}
-
-                        <div class="booked-text">
-                            🔴 Booked
                         </div>
+
 
                         <button
-                            type="button"
-                            class="booked-btn"
-                            disabled
+                            type="submit"
+                            class="book-btn"
                         >
-                            Not Available
+                            Continue with Selected Slots
                         </button>
 
-                    {% else %}
 
-                        <div class="available-text">
-                            🟢 Available
-                        </div>
+                    </form>
 
 
-                        <label
-                            style="
-                                display: block;
-                                margin-top: 15px;
-                                cursor: pointer;
-                            "
-                        >
+                {% else %}
 
-                            <input
-                                type="checkbox"
-                                name="start_times"
-                                value="{{ slot.start|time:'H:i' }}"
-                            >
+                    <div class="empty-slots">
+                        No slots are available for this date.
+                    </div>
 
-                            Select This Slot
+                {% endif %}
 
-                        </label>
 
-                    {% endif %}
+            {% endif %}
 
-                </div>
-
-            {% endfor %}
 
         </div>
 
 
-        <button
-            type="submit"
-            class="book-btn"
-            style="
-                margin-top: 25px;
-                padding: 15px;
-                font-size: 16px;
-            "
-        >
-            Continue with Selected Slots
-        </button>
-
-    </form>
-
-{% else %}
-
-    <div class="empty-slots">
-        No slots are available for this date.
     </div>
 
-{% endif %}
+
+</body>
+
+</html>
