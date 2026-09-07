@@ -125,4 +125,15 @@ urlpatterns = [
         name="mark_payment_unpaid"
     ),
 
+
+    # ==========================================
+    # DELETE BOOKING
+    # ==========================================
+
+    path(
+        "delete-booking/<int:booking_id>/",
+        views.delete_booking,
+        name="delete_booking"
+    ),
+
 ]

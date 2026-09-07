@@ -39,14 +39,14 @@ def create_booking(request):
         return redirect("home")
 
     turf_id = request.POST.get("turf_id")
-
     booking_date = request.POST.get("booking_date")
-
     start_times = request.POST.getlist("start_times")
 
     if not start_times:
 
-        single_start_time = request.POST.get("start_time")
+        single_start_time = request.POST.get(
+            "start_time"
+        )
 
         if single_start_time:
             start_times = [single_start_time]
@@ -66,7 +66,7 @@ def create_booking(request):
         is_active=True
     )
 
-    # One ID for all slots selected in one booking
+    # One group ID for all selected slots
     booking_group_id = uuid.uuid4()
 
     created_booking_ids = []
@@ -86,7 +86,8 @@ def create_booking(request):
             )
 
             end_time_obj = (
-                start_datetime + timedelta(hours=1)
+                start_datetime
+                + timedelta(hours=1)
             ).time()
 
         except ValueError:
@@ -98,7 +99,7 @@ def create_booking(request):
 
             continue
 
-        # Prevent booking an already active slot
+        # Prevent duplicate active bookings
         active_booking_exists = Booking.objects.filter(
             turf=turf,
             booking_date=booking_date,
@@ -138,13 +139,16 @@ def create_booking(request):
 
             )
 
-            created_booking_ids.append(booking.id)
+            created_booking_ids.append(
+                booking.id
+            )
 
         except IntegrityError:
 
             messages.warning(
                 request,
-                f"Slot {start_time} was just booked by another user."
+                f"Slot {start_time} was just booked "
+                "by another user."
             )
 
             continue
@@ -170,7 +174,8 @@ def create_booking(request):
 
     messages.success(
         request,
-        f"{len(created_booking_ids)} slot(s) selected successfully."
+        f"{len(created_booking_ids)} "
+        "slot(s) selected successfully."
     )
 
     return redirect(
@@ -219,7 +224,8 @@ def cancel_booking(request, booking_id):
 
     if request.method == "POST":
 
-        # Cancel every slot in the same group
+        # Cancel the complete booking group
+        # Confirmed bookings are not changed
         Booking.objects.filter(
             user=request.user,
             booking_group_id=booking.booking_group_id
@@ -320,7 +326,10 @@ def process_payment(request, booking_id):
         "payment_method"
     )
 
+    # ======================================
     # ONLINE PAYMENT
+    # ======================================
+
     if payment_method == "online":
 
         bookings.update(
@@ -335,7 +344,10 @@ def process_payment(request, booking_id):
             booking_id=booking.id
         )
 
+    # ======================================
     # OFFLINE PAYMENT
+    # ======================================
+
     if payment_method == "offline":
 
         bookings.update(
@@ -391,7 +403,9 @@ def online_payment(request, booking_id):
         for item in bookings
     )
 
-    amount = int(total_amount * 100)
+    amount = int(
+        total_amount * 100
+    )
 
     try:
 
@@ -403,7 +417,8 @@ def online_payment(request, booking_id):
             }
         )
 
-        # Save Razorpay order ID for all slots
+        # Save the Razorpay order ID
+        # for every slot in the group
         bookings.update(
             razorpay_order_id=razorpay_order["id"]
         )
@@ -416,8 +431,10 @@ def online_payment(request, booking_id):
                 "bookings": bookings,
                 "total_amount": total_amount,
                 "total_slots": bookings.count(),
-                "razorpay_order_id": razorpay_order["id"],
-                "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+                "razorpay_order_id":
+                    razorpay_order["id"],
+                "razorpay_key_id":
+                    settings.RAZORPAY_KEY_ID,
                 "amount": amount,
             }
         )
@@ -431,7 +448,8 @@ def online_payment(request, booking_id):
 
         messages.error(
             request,
-            "Unable to start payment. Please try again."
+            "Unable to start payment. "
+            "Please try again."
         )
 
         return redirect(
@@ -484,8 +502,8 @@ def verify_payment(request, booking_id):
             }
         )
 
-        # Payment successful
-        # Booking remains pending until admin approval
+        # Payment is successful.
+        # Booking remains pending until admin approval.
         bookings.update(
             payment_method="online",
             payment_platform="razorpay",
@@ -507,8 +525,8 @@ def verify_payment(request, booking_id):
 
         messages.success(
             request,
-            "Payment successful! Your payment is marked as paid. "
-            "Please wait for admin approval."
+            "Payment successful! Your payment is marked "
+            "as paid. Please wait for admin approval."
         )
 
         return redirect("my_bookings")
@@ -640,7 +658,9 @@ def manage_bookings(request):
             }
         )
 
-    total_bookings = len(grouped_bookings)
+    total_bookings = len(
+        grouped_bookings
+    )
 
     pending_bookings = sum(
         1
@@ -725,6 +745,15 @@ def approve_booking(request, booking_id):
 
     if request.method == "POST":
 
+        if booking.status == "cancelled":
+
+            messages.error(
+                request,
+                "Cancelled bookings cannot be approved."
+            )
+
+            return redirect("manage_bookings")
+
         Booking.objects.filter(
             booking_group_id=booking.booking_group_id
         ).update(
@@ -781,16 +810,27 @@ def mark_payment_paid(request, booking_id):
 
     if request.method != "POST":
 
-        return redirect("manage_bookings")
+        return redirect(
+            request.GET.get(
+                "next",
+                "manage_bookings"
+            )
+        )
 
     if booking.payment_method != "offline":
 
         messages.error(
             request,
-            "Only offline payments can be marked manually."
+            "Only offline payments can be "
+            "marked manually."
         )
 
-        return redirect("manage_bookings")
+        return redirect(
+            request.POST.get(
+                "next",
+                "manage_bookings"
+            )
+        )
 
     if booking.status != "approved":
 
@@ -799,7 +839,12 @@ def mark_payment_paid(request, booking_id):
             "Please approve the booking first."
         )
 
-        return redirect("manage_bookings")
+        return redirect(
+            request.POST.get(
+                "next",
+                "manage_bookings"
+            )
+        )
 
     Booking.objects.filter(
         booking_group_id=booking.booking_group_id
@@ -813,7 +858,12 @@ def mark_payment_paid(request, booking_id):
         "Offline payment marked as paid successfully."
     )
 
-    return redirect("manage_bookings")
+    return redirect(
+        request.POST.get(
+            "next",
+            "manage_bookings"
+        )
+    )
 
 
 # ==========================================
@@ -836,7 +886,8 @@ def mark_payment_unpaid(request, booking_id):
 
         messages.error(
             request,
-            "Only offline payments can be marked manually."
+            "Only offline payments can be "
+            "marked manually."
         )
 
         return redirect("manage_bookings")
@@ -895,7 +946,7 @@ def confirm_booking(request, booking_id):
 
         return redirect("manage_bookings")
 
-    # Offline payment check
+    # Offline payment must be paid
     if (
         booking.payment_method == "offline"
         and booking.payment_status != "paid"
@@ -903,12 +954,13 @@ def confirm_booking(request, booking_id):
 
         messages.error(
             request,
-            "Please mark the offline payment as paid first."
+            "Please mark the offline payment "
+            "as paid first."
         )
 
         return redirect("manage_bookings")
 
-    # Online payment check
+    # Online payment must already be successful
     if (
         booking.payment_method == "online"
         and booking.payment_status != "paid"
@@ -916,12 +968,13 @@ def confirm_booking(request, booking_id):
 
         messages.error(
             request,
-            "Online payment has not been completed successfully."
+            "Online payment has not been "
+            "completed successfully."
         )
 
         return redirect("manage_bookings")
 
-    # Confirm all slots together
+    # Confirm every slot in the group
     bookings.update(
         status="confirmed"
     )
@@ -932,6 +985,53 @@ def confirm_booking(request, booking_id):
     )
 
     return redirect("manage_bookings")
+
+
+# ==========================================
+# DELETE BOOKING
+# ==========================================
+
+@staff_member_required
+def delete_booking(request, booking_id):
+
+    if request.method != "POST":
+
+        return redirect("admin_dashboard")
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    booking_group_id = booking.booking_group_id
+
+    # Delete every selected slot
+    # belonging to this booking group
+    Booking.objects.filter(
+        booking_group_id=booking_group_id
+    ).delete()
+
+    messages.success(
+        request,
+        "Booking and all its selected slots "
+        "have been deleted successfully."
+    )
+
+    next_page = request.POST.get(
+        "next",
+        "admin_dashboard"
+    )
+
+    # Only allow safe internal named routes
+    allowed_pages = [
+        "admin_dashboard",
+        "manage_bookings",
+    ]
+
+    if next_page not in allowed_pages:
+        next_page = "admin_dashboard"
+
+    return redirect(next_page)
 
 
 # ==========================================

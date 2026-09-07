@@ -5,6 +5,10 @@ from . import views
 
 urlpatterns = [
 
+    # ==========================================
+    # USER AUTHENTICATION
+    # ==========================================
+
     path(
         "register/",
         views.register,
@@ -29,6 +33,11 @@ urlpatterns = [
         name="user_dashboard"
     ),
 
+
+    # ==========================================
+    # MANAGE USERS
+    # ==========================================
+
     path(
         "manage-users/",
         views.manage_users,
@@ -40,6 +49,18 @@ urlpatterns = [
         views.toggle_user_status,
         name="toggle_user_status"
     ),
+
+    # NEW: DELETE NORMAL USER
+    path(
+        "manage-users/<int:user_id>/delete/",
+        views.delete_user,
+        name="delete_user"
+    ),
+
+
+    # ==========================================
+    # MANAGE STAFF ADMINS
+    # ==========================================
 
     path(
         "manage-staff/",

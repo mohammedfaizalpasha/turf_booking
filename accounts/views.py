@@ -405,3 +405,42 @@ def delete_staff(
     return redirect(
         "manage_staff"
     )
+    
+# ==========================================
+# DELETE NORMAL USER
+# ==========================================
+
+@user_passes_test(
+    is_super_admin,
+    login_url="admin_login"
+)
+def delete_user(
+    request,
+    user_id
+):
+
+    if request.method != "POST":
+
+        return redirect(
+            "manage_users"
+        )
+
+    user = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=False,
+        is_superuser=False
+    )
+
+    username = user.username
+
+    user.delete()
+
+    messages.success(
+        request,
+        f"User {username} has been deleted successfully."
+    )
+
+    return redirect(
+        "manage_users"
+    )    
