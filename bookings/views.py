@@ -236,6 +236,10 @@ def my_bookings(request):
 # CANCEL BOOKING
 # ==========================================
 
+# ==================================================
+# CANCEL USER BOOKING
+# ==================================================
+
 @login_required
 def cancel_booking(request, booking_id):
 
@@ -247,22 +251,20 @@ def cancel_booking(request, booking_id):
 
     if request.method == "POST":
 
+        # Cancel ALL slots belonging to this booking group
         Booking.objects.filter(
-            booking_group_id=booking.booking_group_id,
-            user=request.user
+            user=request.user,
+            booking_group_id=booking.booking_group_id
         ).update(
             status="cancelled"
         )
 
         messages.success(
             request,
-            "Your booking has been cancelled."
+            "Your booking has been cancelled successfully."
         )
 
-    return redirect(
-        "my_bookings"
-    )
-
+    return redirect("my_bookings")
 
 # ==========================================
 # PAYMENT PAGE
@@ -572,42 +574,69 @@ def verify_payment(request, booking_id):
 # ADMIN DASHBOARD
 # ==========================================
 
+# ==================================================
+# ADMIN DASHBOARD
+# ==================================================
+
 @staff_member_required
 def admin_dashboard(request):
 
-    bookings = Booking.objects.all()
+    bookings = Booking.objects.select_related(
+        "turf",
+        "user"
+    ).all().order_by(
+        "-booking_date",
+        "-start_time"
+    )
 
-    total_bookings = bookings.values(
-        "booking_group_id"
-    ).distinct().count()
+    # Total individual booking slots
+    total_bookings = bookings.count()
 
+    # Waiting for admin approval
     pending_bookings = bookings.filter(
         status="pending"
-    ).values(
-        "booking_group_id"
-    ).distinct().count()
+    ).count()
 
+    # Approved but not yet finally confirmed
+    approved_bookings = bookings.filter(
+        status="approved"
+    ).count()
+
+    # Fully confirmed bookings
     confirmed_bookings = bookings.filter(
         status="confirmed"
-    ).values(
-        "booking_group_id"
-    ).distinct().count()
+    ).count()
 
+    # Successfully paid bookings
     paid_payments = bookings.filter(
         payment_status="paid"
-    ).values(
-        "booking_group_id"
-    ).distinct().count()
+    ).count()
+
+    # Unpaid bookings
+    unpaid_payments = bookings.filter(
+        payment_status="unpaid"
+    ).count()
+
+    # Cancelled / rejected bookings
+    cancelled_bookings = bookings.filter(
+        status="cancelled"
+    ).count()
+
+    # Recent bookings
+    recent_bookings = bookings[:10]
 
     return render(
         request,
         "bookings/admin_dashboard.html",
         {
-            "bookings": bookings,
+            "bookings": recent_bookings,
             "total_bookings": total_bookings,
             "pending_bookings": pending_bookings,
+            "approved_bookings": approved_bookings,
             "confirmed_bookings": confirmed_bookings,
             "paid_payments": paid_payments,
+            "unpaid_payments": unpaid_payments,
+            "cancelled_bookings": cancelled_bookings,
         }
     )
 
