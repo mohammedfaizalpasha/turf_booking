@@ -592,11 +592,43 @@
                         {% endif %}
 
 
-                        <form
-                            method="POST"
-                            action="{% url 'cancel_booking' booking.id %}"
-                            style="flex: 1;"
-                        >
+                        {% if booking.status != "cancelled" %}
+
+    <form
+        method="POST"
+        action="{% url 'cancel_booking' booking.id %}"
+        style="flex: 1;"
+    >
+
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            class="cancel-btn"
+            onclick="return confirm('Are you sure you want to cancel this booking?');"
+        >
+            Cancel Booking
+        </button>
+
+    </form>
+
+{% else %}
+
+    <div
+        style="
+            flex: 1;
+            padding: 13px;
+            text-align: center;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 10px;
+            font-weight: bold;
+        "
+    >
+        Booking Cancelled
+    </div>
+
+{% endif %}
 
                             {% csrf_token %}
 

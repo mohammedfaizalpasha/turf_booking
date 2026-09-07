@@ -216,11 +216,11 @@ def my_bookings(request):
 
     bookings = Booking.objects.filter(
         user=request.user
-    ).select_related(
-        "turf"
+    ).exclude(
+        status="cancelled"
     ).order_by(
         "-booking_date",
-        "start_time"
+        "-start_time"
     )
 
     return render(
@@ -251,7 +251,7 @@ def cancel_booking(request, booking_id):
 
     if request.method == "POST":
 
-        # Cancel ALL slots belonging to this booking group
+        # Cancel all slots in the same booking group
         Booking.objects.filter(
             user=request.user,
             booking_group_id=booking.booking_group_id
@@ -265,7 +265,6 @@ def cancel_booking(request, booking_id):
         )
 
     return redirect("my_bookings")
-
 # ==========================================
 # PAYMENT PAGE
 # ==========================================
