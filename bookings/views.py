@@ -741,24 +741,61 @@ def confirm_booking(request, booking_id):
 
     if request.method == "POST":
 
-        bookings = Booking.objects.filter(
-            booking_group_id=booking.booking_group_id
-        )
+        # Booking must first be approved
+        if booking.status != "approved":
 
-        bookings.update(
-            status="confirmed"
-        )
+            messages.error(
+                request,
+                "Please approve the booking first."
+            )
+
+            return redirect(
+                "manage_bookings"
+            )
+
+        # Offline payment must be paid before confirmation
+        if (
+            booking.payment_method == "offline"
+            and booking.payment_status != "paid"
+        ):
+
+            messages.error(
+                request,
+                "Offline payment must be marked as paid before confirming."
+            )
+
+            return redirect(
+                "manage_bookings"
+            )
+
+        # Online payment must be successfully completed
+        if (
+            booking.payment_method == "online"
+            and booking.payment_status != "paid"
+        ):
+
+            messages.error(
+                request,
+                "Online payment has not been completed successfully."
+            )
+
+            return redirect(
+                "manage_bookings"
+            )
+
+        booking.status = "confirmed"
+
+        booking.save()
 
         messages.success(
             request,
-            "Booking accepted successfully."
+            "Booking confirmed successfully."
         )
 
     return redirect(
         "manage_bookings"
     )
-
-
+    
 # ==========================================
 # REJECT BOOKING
 # ==========================================
