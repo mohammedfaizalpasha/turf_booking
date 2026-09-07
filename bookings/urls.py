@@ -5,6 +5,10 @@ from . import views
 
 urlpatterns = [
 
+    # ==========================================
+    # USER BOOKING
+    # ==========================================
+
     path(
         "create/",
         views.create_booking,
@@ -22,6 +26,11 @@ urlpatterns = [
         views.cancel_booking,
         name="cancel_booking"
     ),
+
+
+    # ==========================================
+    # PAYMENT
+    # ==========================================
 
     path(
         "payment/<int:booking_id>/",
@@ -47,6 +56,17 @@ urlpatterns = [
         name="verify_payment"
     ),
 
+
+    # ==========================================
+    # ADMIN
+    # ==========================================
+
+    path(
+        "admin-login/",
+        views.admin_login,
+        name="admin_login"
+    ),
+
     path(
         "admin-dashboard/",
         views.admin_dashboard,
@@ -65,10 +85,15 @@ urlpatterns = [
         name="booking_details"
     ),
 
+
+    # ==========================================
+    # BOOKING APPROVAL
+    # ==========================================
+
     path(
-        "confirm-booking/<int:booking_id>/",
-        views.confirm_booking,
-        name="confirm_booking"
+        "approve-booking/<int:booking_id>/",
+        views.approve_booking,
+        name="approve_booking"
     ),
 
     path(
@@ -76,6 +101,17 @@ urlpatterns = [
         views.admin_cancel_booking,
         name="admin_cancel_booking"
     ),
+
+    path(
+        "confirm-booking/<int:booking_id>/",
+        views.confirm_booking,
+        name="confirm_booking"
+    ),
+
+
+    # ==========================================
+    # OFFLINE PAYMENT
+    # ==========================================
 
     path(
         "mark-payment-paid/<int:booking_id>/",
@@ -87,12 +123,6 @@ urlpatterns = [
         "mark-payment-unpaid/<int:booking_id>/",
         views.mark_payment_unpaid,
         name="mark_payment_unpaid"
-    ),
-
-    path(
-        "admin-login/",
-        views.admin_login,
-        name="admin_login"
     ),
 
 ]
